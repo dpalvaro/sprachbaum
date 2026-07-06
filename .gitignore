@@ -141,3 +141,24 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Prisma / DB
+*.db
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Turbo / Next
+.turbo/
+.next/
+dist/
+
+# OS
+.DS_Store
