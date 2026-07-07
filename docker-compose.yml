@@ -29,6 +29,10 @@ services:
     env_file: .env
     environment:
       PORT: ${API_PORT}
+      # Dentro de la red de Docker el host de Postgres es el nombre del
+      # servicio, no localhost; sobrescribe el DATABASE_URL de .env (pensado
+      # para ejecutar Prisma desde el host).
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       # Descomentar si el watch de archivos no se dispara con el bind mount:
       # CHOKIDAR_USEPOLLING: "true"
     ports:
