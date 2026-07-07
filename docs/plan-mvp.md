@@ -26,16 +26,16 @@
 
 ### 2.1 Dentro del alcance (in scope)
 
-| Área | Contenido |
-|---|---|
-| Currículo | Nivel A1 completo: ~12 lecciones (Lektionen), cada una con teoría de gramática, lista de vocabulario, 1 reading y 1 listening |
-| Ejercicios | Huecos (fill-in-the-blank), elección múltiple, ordenar frases, emparejar, dictado simple, comprensión lectora/auditiva con preguntas |
-| SRS | Repaso espaciado de vocabulario con FSRS; sesión diaria de repaso |
-| Progresión | Desbloqueo de lecciones por dominio (umbral de acierto), test de fin de nivel |
-| Analítica | Dominio por skill (mapa de calor gramática/vocab), racha de estudio real (días activos, sin gamificación agresiva), curva de retención, evolución por destreza |
-| Cuentas | Registro/login (email + OAuth Google), perfil, ajustes |
-| Infra | Docker, CI/CD con GitHub Actions, despliegue en producción, monitorización de errores (Sentry), seeds de contenido |
-| Base para billing | Modelo de datos de planes/entitlements y feature flags (Stripe se integra en v2) |
+| Área              | Contenido                                                                                                                                                      |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Currículo         | Nivel A1 completo: ~12 lecciones (Lektionen), cada una con teoría de gramática, lista de vocabulario, 1 reading y 1 listening                                  |
+| Ejercicios        | Huecos (fill-in-the-blank), elección múltiple, ordenar frases, emparejar, dictado simple, comprensión lectora/auditiva con preguntas                           |
+| SRS               | Repaso espaciado de vocabulario con FSRS; sesión diaria de repaso                                                                                              |
+| Progresión        | Desbloqueo de lecciones por dominio (umbral de acierto), test de fin de nivel                                                                                  |
+| Analítica         | Dominio por skill (mapa de calor gramática/vocab), racha de estudio real (días activos, sin gamificación agresiva), curva de retención, evolución por destreza |
+| Cuentas           | Registro/login (email + OAuth Google), perfil, ajustes                                                                                                         |
+| Infra             | Docker, CI/CD con GitHub Actions, despliegue en producción, monitorización de errores (Sentry), seeds de contenido                                             |
+| Base para billing | Modelo de datos de planes/entitlements y feature flags (Stripe se integra en v2)                                                                               |
 
 ### 2.2 Fuera del alcance (out of scope, v2+)
 
@@ -59,19 +59,19 @@
 
 ### 3.1 Stack elegido
 
-| Capa | Tecnología | Justificación |
-|---|---|---|
-| Frontend | **Next.js 15 (App Router) + TypeScript + Tailwind** | SSR/ISR para landing y SEO, React para la app; stack demandadísimo |
-| Backend | **NestJS (TypeScript)** monolito modular | Arquitectura por módulos de dominio, DI, testeable; un solo lenguaje en todo el repo reduce fricción |
-| Base de datos | **PostgreSQL 16** | Relacional para currículo, usuarios, SRS; JSONB para payloads de ejercicios |
-| ORM | **Prisma** | Migraciones versionadas, tipado end-to-end |
-| Caché / colas ligeras | **Redis** (+ BullMQ) | Sesiones, rate limiting, jobs (p. ej. recálculo nocturno de analítica) |
-| Auth | **Auth.js** en el front + JWT/refresh contra el backend, OAuth Google | Estándar, sin vendor lock-in |
-| Almacenamiento de audio | **S3-compatible** (Cloudflare R2) | Audios de listenings; R2 no cobra egress |
-| Infra | **Docker Compose** local; despliegue en **Fly.io o Railway** (backend+Postgres+Redis) y **Vercel** (front) | Barato, reproducible; migrable a AWS+Terraform en v3 si quieres lucir IaC |
-| CI/CD | **GitHub Actions** | Lint, typecheck, tests, build, deploy |
-| Observabilidad | **Sentry** (errores) + logs estructurados (pino) | Suficiente para MVP |
-| Tests | **Vitest/Jest** (unidad), **Supertest** (API), **Playwright** (E2E críticos) | Pirámide de tests real |
+| Capa                    | Tecnología                                                                                                 | Justificación                                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Frontend                | **Next.js 15 (App Router) + TypeScript + Tailwind**                                                        | SSR/ISR para landing y SEO, React para la app; stack demandadísimo                                   |
+| Backend                 | **NestJS (TypeScript)** monolito modular                                                                   | Arquitectura por módulos de dominio, DI, testeable; un solo lenguaje en todo el repo reduce fricción |
+| Base de datos           | **PostgreSQL 16**                                                                                          | Relacional para currículo, usuarios, SRS; JSONB para payloads de ejercicios                          |
+| ORM                     | **Prisma**                                                                                                 | Migraciones versionadas, tipado end-to-end                                                           |
+| Caché / colas ligeras   | **Redis** (+ BullMQ)                                                                                       | Sesiones, rate limiting, jobs (p. ej. recálculo nocturno de analítica)                               |
+| Auth                    | **Auth.js** en el front + JWT/refresh contra el backend, OAuth Google                                      | Estándar, sin vendor lock-in                                                                         |
+| Almacenamiento de audio | **S3-compatible** (Cloudflare R2)                                                                          | Audios de listenings; R2 no cobra egress                                                             |
+| Infra                   | **Docker Compose** local; despliegue en **Fly.io o Railway** (backend+Postgres+Redis) y **Vercel** (front) | Barato, reproducible; migrable a AWS+Terraform en v3 si quieres lucir IaC                            |
+| CI/CD                   | **GitHub Actions**                                                                                         | Lint, typecheck, tests, build, deploy                                                                |
+| Observabilidad          | **Sentry** (errores) + logs estructurados (pino)                                                           | Suficiente para MVP                                                                                  |
+| Tests                   | **Vitest/Jest** (unidad), **Supertest** (API), **Playwright** (E2E críticos)                               | Pirámide de tests real                                                                               |
 
 **Decisión clave — monolito modular, no microservicios:** en el MVP no hay ninguna carga que justifique servicios separados. La estructura por módulos de NestJS (bounded contexts) te deja extraer el futuro servicio de evaluación IA a una cola + worker en v2 sin reescribir nada. Documenta esta decisión en un ADR (Architecture Decision Record) — los ADRs en el repo puntúan mucho en un portfolio.
 
@@ -157,124 +157,124 @@ Convenciones: labels `epic`, `feat`, `chore`, `bug`, `content`, `infra`; priorid
 
 ### Épica E1 — Fundaciones del proyecto (M1) — `epic:foundations`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 1 | Inicializar monorepo (pnpm workspaces + turborepo), apps `web` y `api`, paquete `shared` | P0 | 2 |
-| 2 | Docker Compose: Postgres + Redis + api + web con hot reload | P0 | 2 |
-| 3 | Configurar Prisma + primera migración (User, Level, Lesson) | P0 | 1 |
-| 4 | Linting/format (ESLint flat config + Prettier) + husky pre-commit | P0 | 1 |
-| 5 | CI: workflow de lint + typecheck + tests en cada PR | P0 | 2 |
-| 6 | CD: deploy automático de `api` a Fly.io y `web` a Vercel desde `main` | P0 | 3 |
-| 7 | Sentry en front y back + logging estructurado con pino | P1 | 1 |
-| 8 | `docs/adr/0001-monolito-modular.md` y `docs/architecture.md` con diagrama | P1 | 1 |
-| 9 | Crear `CLAUDE.md` con convenciones del repo (ver sección 7.3) | P0 | 1 |
+| #   | Issue                                                                                    | Prio | Pts |
+| --- | ---------------------------------------------------------------------------------------- | ---- | --- |
+| 1   | Inicializar monorepo (pnpm workspaces + turborepo), apps `web` y `api`, paquete `shared` | P0   | 2   |
+| 2   | Docker Compose: Postgres + Redis + api + web con hot reload                              | P0   | 2   |
+| 3   | Configurar Prisma + primera migración (User, Level, Lesson)                              | P0   | 1   |
+| 4   | Linting/format (ESLint flat config + Prettier) + husky pre-commit                        | P0   | 1   |
+| 5   | CI: workflow de lint + typecheck + tests en cada PR                                      | P0   | 2   |
+| 6   | CD: deploy automático de `api` a Fly.io y `web` a Vercel desde `main`                    | P0   | 3   |
+| 7   | Sentry en front y back + logging estructurado con pino                                   | P1   | 1   |
+| 8   | `docs/adr/0001-monolito-modular.md` y `docs/architecture.md` con diagrama                | P1   | 1   |
+| 9   | Crear `CLAUDE.md` con convenciones del repo (ver sección 7.3)                            | P0   | 1   |
 
 **Definition of Done de la épica:** un cambio trivial llega a producción vía PR con checks en verde.
 
 ### Épica E2 — Autenticación y usuarios (M1) — `epic:auth`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 10 | Registro/login con email+password (hash argon2, verificación por email) | P0 | 3 |
-| 11 | OAuth Google | P1 | 2 |
-| 12 | Sesiones JWT + refresh tokens con rotación; guards en NestJS | P0 | 2 |
-| 13 | Página de perfil y ajustes (idioma de la UI: es/en; objetivo diario de tarjetas) | P1 | 2 |
-| 14 | Rate limiting (Redis) en endpoints de auth | P1 | 1 |
-| 15 | Tests de integración del flujo completo de auth | P0 | 2 |
+| #   | Issue                                                                            | Prio | Pts |
+| --- | -------------------------------------------------------------------------------- | ---- | --- |
+| 10  | Registro/login con email+password (hash argon2, verificación por email)          | P0   | 3   |
+| 11  | OAuth Google                                                                     | P1   | 2   |
+| 12  | Sesiones JWT + refresh tokens con rotación; guards en NestJS                     | P0   | 2   |
+| 13  | Página de perfil y ajustes (idioma de la UI: es/en; objetivo diario de tarjetas) | P1   | 2   |
+| 14  | Rate limiting (Redis) en endpoints de auth                                       | P1   | 1   |
+| 15  | Tests de integración del flujo completo de auth                                  | P0   | 2   |
 
 ### Épica E3 — Currículo y contenido A1 (M2–M4, transversal) — `epic:content`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 16 | Definir `content-schema` (zod): lección, skill, vocab, ejercicio, reading, listening | P0 | 2 |
-| 17 | Comando `content:seed` idempotente (upsert por slug) | P0 | 2 |
-| 18 | Syllabus A1: mapa de 12 lecciones con objetivos MCER (basado en inventarios Goethe A1) | P0 | 2 |
-| 19–24 | Contenido lecciones 1–6 (una issue por par de lecciones): gramática, ~40 palabras/lección, 8–12 ejercicios, 1 reading | P0 | 3×3 |
-| 25–27 | Contenido lecciones 7–12 (ídem) | P0 | 3×3 |
-| 28 | Audios de listenings: generación TTS (voz alemana de calidad) + subida a R2 + script de pipeline | P0 | 3 |
-| 29 | Test de fin de nivel A1 (60 preguntas mezclando destrezas) | P1 | 3 |
-| 30 | Revisión de calidad del contenido con hablante/profesor o herramienta de verificación (checklist documentada) | P1 | 2 |
+| #     | Issue                                                                                                                 | Prio | Pts |
+| ----- | --------------------------------------------------------------------------------------------------------------------- | ---- | --- |
+| 16    | Definir `content-schema` (zod): lección, skill, vocab, ejercicio, reading, listening                                  | P0   | 2   |
+| 17    | Comando `content:seed` idempotente (upsert por slug)                                                                  | P0   | 2   |
+| 18    | Syllabus A1: mapa de 12 lecciones con objetivos MCER (basado en inventarios Goethe A1)                                | P0   | 2   |
+| 19–24 | Contenido lecciones 1–6 (una issue por par de lecciones): gramática, ~40 palabras/lección, 8–12 ejercicios, 1 reading | P0   | 3×3 |
+| 25–27 | Contenido lecciones 7–12 (ídem)                                                                                       | P0   | 3×3 |
+| 28    | Audios de listenings: generación TTS (voz alemana de calidad) + subida a R2 + script de pipeline                      | P0   | 3   |
+| 29    | Test de fin de nivel A1 (60 preguntas mezclando destrezas)                                                            | P1   | 3   |
+| 30    | Revisión de calidad del contenido con hablante/profesor o herramienta de verificación (checklist documentada)         | P1   | 2   |
 
 > Consejo: escribe tú el contenido de las lecciones 1–2 a mano para fijar el estándar de calidad, y a partir de ahí usa el pipeline LLM+revisión (sección 7.5).
 
 ### Épica E4 — Motor de ejercicios (M2) — `epic:exercises`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 31 | Modelo `Exercise`/`Attempt` + endpoint de corrección server-side | P0 | 2 |
-| 32 | Componente FillInTheBlank (con tolerancia a mayúsculas/espacios, feedback de diacríticos ä/ö/ü/ß + teclado en pantalla) | P0 | 3 |
-| 33 | Componente MultipleChoice | P0 | 1 |
-| 34 | Componente SentenceOrder (drag & drop accesible) | P0 | 3 |
-| 35 | Componente Matching (parejas palabra-traducción/imagen) | P1 | 2 |
-| 36 | Componente Dictation (reproductor + input; comparación con distancia de edición y resaltado de errores) | P1 | 3 |
-| 37 | Player de listening con velocidad 0.75x/1x y transcripción ocultable | P0 | 2 |
-| 38 | Vista de Reading con glosario tap-to-translate de palabras marcadas | P1 | 2 |
-| 39 | Runner de lección: secuencia teoría → ejercicios → resumen de resultados | P0 | 3 |
-| 40 | Emisión de `LearningEvent` en cada intento (tipo, acierto, latencia, skill) | P0 | 1 |
-| 41 | Tests E2E (Playwright): completar una lección entera | P0 | 2 |
+| #   | Issue                                                                                                                   | Prio | Pts |
+| --- | ----------------------------------------------------------------------------------------------------------------------- | ---- | --- |
+| 31  | Modelo `Exercise`/`Attempt` + endpoint de corrección server-side                                                        | P0   | 2   |
+| 32  | Componente FillInTheBlank (con tolerancia a mayúsculas/espacios, feedback de diacríticos ä/ö/ü/ß + teclado en pantalla) | P0   | 3   |
+| 33  | Componente MultipleChoice                                                                                               | P0   | 1   |
+| 34  | Componente SentenceOrder (drag & drop accesible)                                                                        | P0   | 3   |
+| 35  | Componente Matching (parejas palabra-traducción/imagen)                                                                 | P1   | 2   |
+| 36  | Componente Dictation (reproductor + input; comparación con distancia de edición y resaltado de errores)                 | P1   | 3   |
+| 37  | Player de listening con velocidad 0.75x/1x y transcripción ocultable                                                    | P0   | 2   |
+| 38  | Vista de Reading con glosario tap-to-translate de palabras marcadas                                                     | P1   | 2   |
+| 39  | Runner de lección: secuencia teoría → ejercicios → resumen de resultados                                                | P0   | 3   |
+| 40  | Emisión de `LearningEvent` en cada intento (tipo, acierto, latencia, skill)                                             | P0   | 1   |
+| 41  | Tests E2E (Playwright): completar una lección entera                                                                    | P0   | 2   |
 
 ### Épica E5 — SRS de vocabulario (M3) — `epic:srs`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 42 | Integrar ts-fsrs; modelo `SrsCard` + transición de estados | P0 | 2 |
-| 43 | Endpoint `GET /srs/session` (due + nuevas, límites configurables) | P0 | 2 |
-| 44 | UI de sesión de repaso (flashcard con audio, revelar, 4 botones de calificación) | P0 | 3 |
-| 45 | Modo "repaso como ejercicio": la tarjeta se presenta como hueco o elección múltiple y la calificación FSRS se deriva del resultado | P1 | 2 |
-| 46 | Widget "tarjetas pendientes hoy" en el dashboard | P0 | 1 |
-| 47 | Tests unitarios del scheduler (casos: nueva, lapse, madura) | P0 | 2 |
+| #   | Issue                                                                                                                              | Prio | Pts |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------- | ---- | --- |
+| 42  | Integrar ts-fsrs; modelo `SrsCard` + transición de estados                                                                         | P0   | 2   |
+| 43  | Endpoint `GET /srs/session` (due + nuevas, límites configurables)                                                                  | P0   | 2   |
+| 44  | UI de sesión de repaso (flashcard con audio, revelar, 4 botones de calificación)                                                   | P0   | 3   |
+| 45  | Modo "repaso como ejercicio": la tarjeta se presenta como hueco o elección múltiple y la calificación FSRS se deriva del resultado | P1   | 2   |
+| 46  | Widget "tarjetas pendientes hoy" en el dashboard                                                                                   | P0   | 1   |
+| 47  | Tests unitarios del scheduler (casos: nueva, lapse, madura)                                                                        | P0   | 2   |
 
 ### Épica E6 — Progresión y desbloqueo (M3) — `epic:progression`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 48 | Cálculo de `SkillMastery` (acierto ponderado por recencia; umbral de dominio 80%) | P0 | 2 |
-| 49 | Regla de desbloqueo: lección N+1 requiere ≥70% en ejercicios de la N | P0 | 1 |
-| 50 | Mapa del curso (vista de nivel con lecciones, estados: bloqueada/en curso/dominada) | P0 | 3 |
-| 51 | Test de nivel A1 con puntuación por destreza y certificado interno descargable | P2 | 2 |
+| #   | Issue                                                                               | Prio | Pts |
+| --- | ----------------------------------------------------------------------------------- | ---- | --- |
+| 48  | Cálculo de `SkillMastery` (acierto ponderado por recencia; umbral de dominio 80%)   | P0   | 2   |
+| 49  | Regla de desbloqueo: lección N+1 requiere ≥70% en ejercicios de la N                | P0   | 1   |
+| 50  | Mapa del curso (vista de nivel con lecciones, estados: bloqueada/en curso/dominada) | P0   | 3   |
+| 51  | Test de nivel A1 con puntuación por destreza y certificado interno descargable      | P2   | 2   |
 
 ### Épica E7 — Analítica de progreso (M4) — `epic:analytics`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 52 | Job nocturno (BullMQ) de agregación de eventos → tablas de resumen diario | P0 | 2 |
-| 53 | Dashboard: actividad (días activos, tiempo estimado, ejercicios/semana) | P0 | 2 |
-| 54 | Mapa de calor de dominio por skill de gramática y por tema de vocabulario | P0 | 3 |
-| 55 | Curva de retención de vocabulario (proyección FSRS: % que recordarás hoy/en 7/30 días) | P1 | 2 |
-| 56 | Sección "Puntos débiles" con CTA que genera una sesión de práctica dirigida a las 3 skills peores | P0 | 3 |
-| 57 | Evolución por destreza (Lesen vs. Hören vs. gramática) en el tiempo | P1 | 2 |
-| 58 | Endpoint de export de datos del usuario (JSON) — base para GDPR | P1 | 1 |
+| #   | Issue                                                                                             | Prio | Pts |
+| --- | ------------------------------------------------------------------------------------------------- | ---- | --- |
+| 52  | Job nocturno (BullMQ) de agregación de eventos → tablas de resumen diario                         | P0   | 2   |
+| 53  | Dashboard: actividad (días activos, tiempo estimado, ejercicios/semana)                           | P0   | 2   |
+| 54  | Mapa de calor de dominio por skill de gramática y por tema de vocabulario                         | P0   | 3   |
+| 55  | Curva de retención de vocabulario (proyección FSRS: % que recordarás hoy/en 7/30 días)            | P1   | 2   |
+| 56  | Sección "Puntos débiles" con CTA que genera una sesión de práctica dirigida a las 3 skills peores | P0   | 3   |
+| 57  | Evolución por destreza (Lesen vs. Hören vs. gramática) en el tiempo                               | P1   | 2   |
+| 58  | Endpoint de export de datos del usuario (JSON) — base para GDPR                                   | P1   | 1   |
 
 ### Épica E8 — Base de monetización (M5) — `epic:billing`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 59 | Modelo `Plan`/`Entitlement` + servicio de feature flags (`hasFeature(user, 'ai_corrections')`) | P0 | 2 |
-| 60 | Gating declarativo en rutas/UI (todo A1 = FREE en MVP; contenido A2+ marcado PLUS) | P1 | 1 |
-| 61 | Página de precios estática (sin checkout) + waitlist de "Plus" para medir intención de pago | P1 | 1 |
-| 62 | ADR de la futura integración Stripe (webhooks, customer portal, estados de suscripción) | P2 | 1 |
+| #   | Issue                                                                                          | Prio | Pts |
+| --- | ---------------------------------------------------------------------------------------------- | ---- | --- |
+| 59  | Modelo `Plan`/`Entitlement` + servicio de feature flags (`hasFeature(user, 'ai_corrections')`) | P0   | 2   |
+| 60  | Gating declarativo en rutas/UI (todo A1 = FREE en MVP; contenido A2+ marcado PLUS)             | P1   | 1   |
+| 61  | Página de precios estática (sin checkout) + waitlist de "Plus" para medir intención de pago    | P1   | 1   |
+| 62  | ADR de la futura integración Stripe (webhooks, customer portal, estados de suscripción)        | P2   | 1   |
 
 ### Épica E9 — Pulido, legal y lanzamiento (M5) — `epic:launch`
 
-| # | Issue | Prio | Pts |
-|---|---|---|---|
-| 63 | Landing page con propuesta de valor + SEO básico | P0 | 2 |
-| 64 | PWA: manifest, iconos, uso offline básico de la sesión SRS descargada | P2 | 3 |
-| 65 | Accesibilidad: navegación por teclado en todos los ejercicios, contraste AA | P1 | 2 |
-| 66 | Política de privacidad + términos + banner de cookies mínimo (GDPR) | P0 | 1 |
-| 67 | Onboarding: cuestionario inicial (¿por qué alemán?, objetivo, minutos/día) → personaliza cupo SRS | P1 | 2 |
-| 68 | Beta cerrada: invitar 10–20 usuarios, formulario de feedback, corrección de bugs | P0 | 3 |
-| 69 | README de portfolio: capturas, arquitectura, decisiones, demo pública | P0 | 1 |
+| #   | Issue                                                                                             | Prio | Pts |
+| --- | ------------------------------------------------------------------------------------------------- | ---- | --- |
+| 63  | Landing page con propuesta de valor + SEO básico                                                  | P0   | 2   |
+| 64  | PWA: manifest, iconos, uso offline básico de la sesión SRS descargada                             | P2   | 3   |
+| 65  | Accesibilidad: navegación por teclado en todos los ejercicios, contraste AA                       | P1   | 2   |
+| 66  | Política de privacidad + términos + banner de cookies mínimo (GDPR)                               | P0   | 1   |
+| 67  | Onboarding: cuestionario inicial (¿por qué alemán?, objetivo, minutos/día) → personaliza cupo SRS | P1   | 2   |
+| 68  | Beta cerrada: invitar 10–20 usuarios, formulario de feedback, corrección de bugs                  | P0   | 3   |
+| 69  | README de portfolio: capturas, arquitectura, decisiones, demo pública                             | P0   | 1   |
 
 ### Milestones
 
-| Milestone | Semanas | Épicas | Resultado |
-|---|---|---|---|
-| **M1 — Esqueleto en producción** | 1–3 | E1, E2 | Deploy continuo funcionando, login operativo |
-| **M2 — Primera lección jugable** | 4–6 | E4 + lecciones 1–2 (E3) | Un usuario completa la lección 1 de principio a fin |
-| **M3 — Estudiar de verdad** | 7–9 | E5, E6 + lecciones 3–6 | SRS diario + desbloqueo por dominio |
-| **M4 — Verse progresar** | 10–12 | E7 + lecciones 7–10 | Dashboard de analítica completo |
-| **M5 — Lanzamiento beta** | 13–16 | E8, E9 + lecciones 11–12 | Beta pública con A1 completo |
+| Milestone                        | Semanas | Épicas                   | Resultado                                           |
+| -------------------------------- | ------- | ------------------------ | --------------------------------------------------- |
+| **M1 — Esqueleto en producción** | 1–3     | E1, E2                   | Deploy continuo funcionando, login operativo        |
+| **M2 — Primera lección jugable** | 4–6     | E4 + lecciones 1–2 (E3)  | Un usuario completa la lección 1 de principio a fin |
+| **M3 — Estudiar de verdad**      | 7–9     | E5, E6 + lecciones 3–6   | SRS diario + desbloqueo por dominio                 |
+| **M4 — Verse progresar**         | 10–12   | E7 + lecciones 7–10      | Dashboard de analítica completo                     |
+| **M5 — Lanzamiento beta**        | 13–16   | E8, E9 + lecciones 11–12 | Beta pública con A1 completo                        |
 
 ---
 
@@ -302,6 +302,7 @@ Esta sección explica el entorno de desarrollo recomendado y cómo optimizar el 
 Para un proyecto así, la herramienta idónea es **Claude Code**: el agente de programación de Anthropic que trabaja directamente sobre tu repositorio — lee tu código, edita ficheros, ejecuta comandos y tests, y maneja git, todo desde el terminal o integrado en tu IDE. A diferencia del chat, opera dentro de tu entorno real de desarrollo, con el contexto de todo el proyecto.
 
 **Instalación y requisitos:**
+
 - Necesitas una suscripción de Claude (Pro o superior) o una cuenta de Claude Console con crédito de API; el plan gratuito no incluye Claude Code.
 - El método recomendado es el **instalador nativo** (no requiere Node.js y se autoactualiza); también puede instalarse vía npm (`npm install -g @anthropic-ai/claude-code`) o gestores de paquetes del sistema. En Windows funciona nativamente o vía WSL.
 - Tras instalar: `cd` a la carpeta del proyecto, ejecuta `claude`, y autentícate en el navegador la primera vez.
@@ -309,6 +310,7 @@ Para un proyecto así, la herramienta idónea es **Claude Code**: el agente de p
 - Documentación oficial y guía de inicio: https://docs.claude.com/en/docs/claude-code/overview
 
 **Entorno de desarrollo recomendado para este proyecto:**
+
 - **VS Code + extensión de Claude Code** (o el CLI en un panel del terminal): ves los diffs que propone Claude dentro del editor y los apruebas ahí.
 - **Docker Desktop** con el `docker-compose.yml` del repo levantado: Claude puede ejecutar `docker compose up`, correr migraciones de Prisma y lanzar tests contra la base de datos real.
 - Un terminal con **paneles divididos** (tmux, Zellij, o el terminal integrado de VS Code): Claude Code a la izquierda, logs de `docker compose` y del dev server a la derecha.
@@ -322,17 +324,20 @@ Claude Code lee automáticamente el fichero `CLAUDE.md` de la raíz del repo en 
 # Sprachbaum — contexto para Claude Code
 
 ## Qué es
+
 App de aprendizaje de alemán por niveles MCER (MVP = A1). Monorepo pnpm:
 apps/web (Next.js 15), apps/api (NestJS), packages/shared (tipos+zod).
 
 ## Comandos
-- pnpm dev          # levanta web+api (requiere docker compose up -d)
-- pnpm test         # unit tests (vitest)
-- pnpm test:e2e     # Playwright
-- pnpm db:migrate   # prisma migrate dev
+
+- pnpm dev # levanta web+api (requiere docker compose up -d)
+- pnpm test # unit tests (vitest)
+- pnpm test:e2e # Playwright
+- pnpm db:migrate # prisma migrate dev
 - pnpm content:seed # carga content/de/a1 en Postgres
 
 ## Convenciones
+
 - TypeScript estricto; nada de `any`
 - Validación de entrada con zod en el borde (controllers y formularios)
 - Toda mutación de aprendizaje emite un LearningEvent (append-only)
@@ -341,10 +346,12 @@ apps/web (Next.js 15), apps/api (NestJS), packages/shared (tipos+zod).
 - Tests obligatorios para servicios de dominio (srs, exercises, analytics)
 
 ## Arquitectura
+
 Ver docs/architecture.md y docs/adr/. No introducir microservicios;
 es un monolito modular a propósito.
 
 ## Qué NO hacer
+
 - No añadir features fuera del milestone actual (ver GitHub Projects)
 - No tocar el esquema de content-schema sin actualizar el seed y los ADR
 ```
@@ -371,7 +378,7 @@ Mantén este fichero actualizado como si fuera código: cada vez que Claude come
 El contenido A1 es tu mayor coste. Automatízalo así:
 
 1. Define el `content-schema` (issue 16) con ejemplos anotados.
-2. En un Proyecto de claude.ai, guarda: el esquema, el syllabus A1, y las lecciones 1–2 escritas a mano como *gold standard*.
+2. En un Proyecto de claude.ai, guarda: el esquema, el syllabus A1, y las lecciones 1–2 escritas a mano como _gold standard_.
 3. Para cada lección nueva, pide a Claude el YAML completo (vocabulario con género y plural, ejercicios con soluciones, reading graduado al vocabulario ya visto) y **valídalo automáticamente**: el CI ejecuta el validador zod + checks de consistencia (que ninguna palabra del reading esté fuera del vocabulario acumulado, que las soluciones existan, etc.).
 4. Revisión humana en la PR del contenido: tú revisas estudiando (dogfooding) y, antes de la beta, una pasada de un nativo/profesor.
 5. Los audios: script que recorre los listenings y genera TTS → R2 (issue 28).
