@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  locale    String   @default("es")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Level {
+  id      String   @id @default(cuid())
+  code    String   @unique
+  lessons Lesson[]
+}
+
+model Lesson {
+  id         String   @id @default(cuid())
+  levelId    String
+  level      Level    @relation(fields: [levelId], references: [id])
+  order      Int
+  title      String
+  objectives String[]
+  updatedAt  DateTime @updatedAt
+
+  @@unique([levelId, order])
+}
