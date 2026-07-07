@@ -13,7 +13,7 @@
     "typecheck": "turbo run typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "db:migrate": "pnpm --filter api db:migrate",
     "db:deploy": "pnpm --filter api db:deploy",
     "db:studio": "pnpm --filter api db:studio"
