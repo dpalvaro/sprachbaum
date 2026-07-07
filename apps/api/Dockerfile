@@ -11,9 +11,9 @@
 #   3. runner  - copies just that self-contained package into a clean
 #                base image and runs it.
 #
-# Database migrations are intentionally NOT run here. Configure
-# `npx prisma migrate deploy` as Render's Pre-Deploy Command instead,
-# so it runs against the built image right before traffic switches over.
+# Migrations run at container startup (CMD below), not during this build -
+# Render's Pre-Deploy Command is a paid-plan-only feature, unavailable on
+# the free tier this service targets.
 
 FROM node:22-alpine AS base
 RUN apk add --no-cache openssl
@@ -74,4 +74,19 @@ USER node
 # process actually binds via the PORT env var it injects (see main.ts).
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+# Runs on every container start (not just deploys), including free-tier
+# cold-starts after the service sleeps - safe because `migrate deploy` is
+# idempotent (no-ops when there's nothing pending). If it fails, the `&&`
+# stops `node dist/main.js` from ever running, so the container exits
+# instead of serving traffic against a schema that isn't fully migrated.
+#
+# - `./node_modules/.bin/prisma` instead of `npx prisma`: npx also does an
+#   npm-update network check on every invocation; calling the local binary
+#   directly avoids that network round trip on every boot.
+# - `exec node dist/main.js`: without `exec`, `sh -c` stays PID 1 and
+#   doesn't forward signals to the Node child, so Render's SIGTERM on
+#   redeploy/scale-down would never reach Nest and it'd get force-killed
+#   after the timeout instead of shutting down gracefully. `exec` replaces
+#   the shell with the Node process so it becomes PID 1 and gets the signal
+#   directly.
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && exec node dist/main.js"]
