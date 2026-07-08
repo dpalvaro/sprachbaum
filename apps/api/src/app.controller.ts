@@ -9,4 +9,10 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  // TODO: temporal, eliminar tras verificar Sentry en producción
+  @Get('debug-sentry')
+  getDebugSentry(): never {
+    throw new Error('Sentry backend test');
+  }
 }
