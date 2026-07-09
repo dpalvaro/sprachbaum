@@ -122,16 +122,31 @@ flowchart LR
 
 ### 3.4 Modelo de datos (núcleo)
 
-Entidades principales y relaciones (esquema Prisma resumido):
+Entidades principales y relaciones (esquema Prisma resumido; el contenido —
+`Skill`/`Section`/`VocabItem`/`Exercise`/`LessonSkill`— está implementado por
+`content:seed`, issue #17; ver `docs/content-schema-design.md` §7 para la
+correspondencia YAML → tablas):
 
 ```
 User(id, email, name, locale, createdAt)
-Level(id, code)                      # 'A1'
-Lesson(id, levelId, order, title, objectives)
+Level(id, code)                                          # 'A1'
+Lesson(id, slug, levelId, order, title JSONB, objectives JSONB)
 Skill(id, levelId, type, name)       # type: GRAMMAR | VOCAB_TOPIC | READING | LISTENING
-LessonSkill(lessonId, skillId)
-VocabItem(id, skillId, lemma, translation, example, audioUrl, gender, plural)
-Exercise(id, lessonId, skillId, type, payload JSONB, solution JSONB, difficulty)
+                                      # se deriva 1:1 de cada sección del YAML:
+                                      # (levelId, type = f(section.type), name = section.slug).
+                                      # NO se deriva del `skillTag` libre de cada ejercicio
+                                      # (frágil: opcional, no existe en VocabItem); ese skillTag
+                                      # se conserva tal cual dentro de Exercise.payload como
+                                      # metadato para analítica más fina en M4.
+LessonSkill(lessonId, skillId, order)  # permite reutilizar un Skill entre varias lecciones
+Section(id, slug, lessonId, skillId, type, order, title JSONB?, content JSONB)
+                                      # materializa una sección del YAML; content varía por type:
+                                      # {explanation, examples} | {topic} | {text, glossary} | {audio, transcript}
+VocabItem(id, slug, sectionId, skillId, lemma, translation JSONB, example, exampleTranslation JSONB,
+          audioUrl, partOfSpeech, gender, plural, order)
+Exercise(id, slug, lessonId, sectionId, skillId, type, order, payload JSONB, solution JSONB, difficulty)
+                                      # payload = lo que ve el cliente antes de responder;
+                                      # solution = lo que solo corrige el servidor (nunca se sirve antes de corregir)
 Attempt(id, userId, exerciseId, answer JSONB, isCorrect, latencyMs, createdAt)
 SrsCard(id, userId, vocabItemId, stability, difficulty, due, lastReview, state)
 LearningEvent(id, userId, type, entityId, data JSONB, createdAt)   # append-only
@@ -139,6 +154,11 @@ SkillMastery(userId, skillId, score, updatedAt)                    # agregado de
 Plan(id, code)          # FREE, PLUS (stub)
 Entitlement(userId, feature, source)
 ```
+
+Todas las entidades de contenido con identidad propia en el YAML (`Lesson`,
+`Section`, `VocabItem`, `Exercise`) tienen `slug` único: es la clave de
+idempotencia de `content:seed` (upsert por slug; lo que desaparece del YAML
+se borra, scopeado a la lección — ver `docs/content-schema-design.md` §6).
 
 Principio rector: **`LearningEvent` es la fuente de verdad de la analítica.** `SkillMastery` y demás vistas se recalculan desde eventos (job nocturno + actualización incremental en caliente). Esto te permite añadir nuevas métricas en el futuro sin haber perdido datos.
 

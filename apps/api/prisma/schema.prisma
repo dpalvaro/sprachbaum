@@ -20,16 +20,145 @@ model Level {
   id      String   @id @default(cuid())
   code    String   @unique
   lessons Lesson[]
+  skills  Skill[]
 }
 
 model Lesson {
-  id         String   @id @default(cuid())
-  levelId    String
-  level      Level    @relation(fields: [levelId], references: [id])
-  order      Int
-  title      String
-  objectives String[]
-  updatedAt  DateTime @updatedAt
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  levelId      String
+  level        Level         @relation(fields: [levelId], references: [id])
+  order        Int
+  title        Json
+  objectives   Json
+  updatedAt    DateTime      @updatedAt
+  sections     Section[]
+  exercises    Exercise[]
+  lessonSkills LessonSkill[]
 
   @@unique([levelId, order])
+}
+
+/// Dimensión de dominio para agrupar mastery/analítica. Se deriva 1:1 de cada
+/// sección del YAML (levelId, type, name = section.slug), no del `skillTag`
+/// libre de cada ejercicio (ver docs/content-schema-design.md §7 y ADR pendiente).
+enum SkillType {
+  GRAMMAR
+  VOCAB_TOPIC
+  READING
+  LISTENING
+}
+
+model Skill {
+  id           String        @id @default(cuid())
+  levelId      String
+  level        Level         @relation(fields: [levelId], references: [id])
+  type         SkillType
+  name         String
+  lessonSkills LessonSkill[]
+  sections     Section[]
+  vocabItems   VocabItem[]
+  exercises    Exercise[]
+
+  @@unique([levelId, type, name])
+}
+
+/// Join table: permite reutilizar un Skill entre varias lecciones a futuro.
+model LessonSkill {
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  skillId  String
+  skill    Skill  @relation(fields: [skillId], references: [id])
+  order    Int
+
+  @@id([lessonId, skillId])
+}
+
+/// Tipo de sección tal cual el discriminante del YAML (content-schema `SectionSchema`).
+enum SectionType {
+  grammar
+  vocabulary
+  reading
+  listening
+}
+
+/// Materializa una sección del YAML. No existía en el sketch de
+/// docs/plan-mvp.md §3.4; se añade porque el contenido narrativo de cada
+/// sección (explanation/examples, topic, text/glossary, audio/transcript) no
+/// tiene dónde vivir si solo existen Skill + Exercise + VocabItem.
+model Section {
+  id         String      @id @default(cuid())
+  slug       String      @unique
+  lessonId   String
+  lesson     Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  skillId    String
+  skill      Skill       @relation(fields: [skillId], references: [id])
+  type       SectionType
+  order      Int
+  title      Json?
+  /// Contenido específico del tipo: {explanation, examples} | {topic} | {text, glossary} | {audio, transcript}
+  content    Json
+  vocabItems VocabItem[]
+  exercises  Exercise[]
+}
+
+enum VocabPartOfSpeech {
+  noun
+  verb
+  adjective
+  adverb
+  phrase
+  other
+}
+
+enum VocabGender {
+  der
+  die
+  das
+}
+
+model VocabItem {
+  id                 String             @id @default(cuid())
+  slug               String             @unique
+  sectionId          String
+  section            Section            @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  skillId            String
+  skill              Skill              @relation(fields: [skillId], references: [id])
+  lemma              String
+  translation        Json
+  example            String?
+  exampleTranslation Json?
+  audioUrl           String?
+  partOfSpeech       VocabPartOfSpeech?
+  gender             VocabGender?
+  plural             String?
+  order              Int
+}
+
+/// Tipo de ejercicio tal cual el discriminante del YAML (content-schema `ExerciseSchema`).
+enum ExerciseType {
+  fill_blank
+  multiple_choice
+  matching
+  sentence_order
+  dictation
+  short_answer
+}
+
+model Exercise {
+  id         String       @id @default(cuid())
+  slug       String       @unique
+  lessonId   String
+  lesson     Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  sectionId  String
+  section    Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  skillId    String
+  skill      Skill        @relation(fields: [skillId], references: [id])
+  type       ExerciseType
+  order      Int
+  /// Lo que ve el cliente antes de resolver: prompt, options/pairs/fragments/text/audio, skillTag crudo.
+  payload    Json
+  /// Lo que NUNCA se manda al cliente antes de corregir: correctIndices, blanks.accept, correctOrder, expected, accept.
+  solution   Json
+  difficulty Int?
 }
