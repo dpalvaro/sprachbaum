@@ -29,6 +29,13 @@ FROM base AS builder
 # turbo.json isn't part of the pruned output, but `turbo run build` needs it.
 COPY turbo.json turbo.json
 
+# Same deal: packages/content-schema's tsconfig.json (and packages/shared's)
+# extends this root file via "../../tsconfig.base.json", but `turbo prune`
+# only copies each package's own directory plus the workspace root files it
+# knows about - not arbitrary files a package's tsconfig happens to reach up
+# to. Without this, tsc fails with TS5083 (cannot read tsconfig.base.json).
+COPY tsconfig.base.json tsconfig.base.json
+
 # Install deps for the pruned workspace first (cached while lockfile/package.json
 # are unchanged). --ignore-scripts because apps/api's postinstall runs
 # `prisma generate`, which needs prisma/schema.prisma - not copied yet at this point.
