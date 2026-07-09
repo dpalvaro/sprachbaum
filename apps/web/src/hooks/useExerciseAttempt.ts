@@ -7,12 +7,16 @@ import type { AttemptResult } from '../lib/types';
 
 export type { AttemptStatus };
 
+type Answer =
+  { selectedIndices: number[] } | { values: Record<string, string> };
+
 /**
  * Estado + llamada de red compartidos por cualquier tipo de ejercicio: mide
  * latencia desde que se muestra el ejercicio, envía el intento, y traduce la
  * respuesta del servidor a un estado de UI. Cada componente de ejercicio solo
- * aporta la forma de `answer` (aquí, `selectedIndices`); cuando lleguen los
- * otros tipos, este hook es lo que reutilizan en vez de reimplementar el POST.
+ * aporta la forma de `answer` (`selectedIndices` en multiple_choice, `values`
+ * en fill_blank); cuando lleguen los otros tipos, este hook es lo que
+ * reutilizan en vez de reimplementar el POST.
  */
 export function useExerciseAttempt(exerciseId: string) {
   const [status, setStatus] = useState<AttemptStatus>('answering');
@@ -21,13 +25,13 @@ export function useExerciseAttempt(exerciseId: string) {
   const shownAt = useRef(Date.now());
 
   const submit = useCallback(
-    async (selectedIndices: number[]) => {
+    async (answer: Answer) => {
       setStatus('submitting');
       setError(null);
       try {
         const latencyMs = Date.now() - shownAt.current;
         const result = await submitAttempt(exerciseId, {
-          answer: { selectedIndices },
+          answer,
           latencyMs,
         });
         setLastResult(result);

@@ -1,15 +1,23 @@
 import { z } from 'zod';
 
 /**
- * Por ahora solo se valida la forma de respuesta de multiple_choice: es el
- * único tipo con corrección implementada en este slice. Cuando se añadan los
- * otros cinco tipos, esto pasa a una unión discriminada por el `type` del
- * ejercicio, igual que ExerciseSchema en content-schema.
+ * Unión discriminada por la forma de `answer`, no por el `type` del ejercicio
+ * (el controller no conoce el tipo hasta que el servicio carga el ejercicio).
+ * El servicio valida que la forma recibida corresponda al `type` real antes de
+ * corregir. Cuando se añadan los cuatro tipos restantes, cada uno suma un
+ * miembro aquí.
  */
-export const SubmitAttemptSchema = z.object({
-  answer: z.object({
+const AnswerSchema = z.union([
+  z.object({
     selectedIndices: z.array(z.number().int().nonnegative()).min(1),
   }),
+  z.object({
+    values: z.record(z.string(), z.string()),
+  }),
+]);
+
+export const SubmitAttemptSchema = z.object({
+  answer: AnswerSchema,
   latencyMs: z.number().int().nonnegative(),
 });
 

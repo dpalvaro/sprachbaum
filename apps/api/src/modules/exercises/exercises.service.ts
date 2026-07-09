@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   NotImplementedException,
 } from '@nestjs/common';
 import { ExerciseType, LearningEventType } from '@prisma/client';
+import { canonicalFormIfDifferent, matchesAccepted } from '@sprachbaum/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CurrentUserService } from './current-user.provider';
 import type { SubmitAttemptInput } from './dto/submit-attempt.dto';
@@ -25,12 +27,27 @@ export interface PublicExercise {
 export interface AttemptResult {
   correct: boolean;
   attemptNumber: number;
-  /** Solo presente si !correct && attemptNumber >= 2 (política de "revela tras el 2º fallo"). */
+  /**
+   * Solo presente si !correct && attemptNumber >= 2 (política de "revela tras
+   * el 2º fallo"). Forma depende del tipo: number[] en multiple_choice,
+   * Record<blankId, string[]> (formas aceptadas) en fill_blank.
+   */
   revealedSolution?: unknown;
+  /**
+   * Solo presente si correct && el usuario escribió una variante ASCII
+   * (ue/oe/ae/ss) de una forma con diéresis/ß. Permite mostrar "Se escribe:
+   * Tschüss" sin penalizar por no tener teclado alemán. Hoy solo lo rellena
+   * fill_blank.
+   */
+  canonicalAnswers?: Record<string, string>;
 }
 
 interface MultipleChoiceSolution {
   correctIndices: number[];
+}
+
+interface FillBlankSolution {
+  blanks: { id: string; accept: string[]; caseSensitive?: boolean }[];
 }
 
 function sameIndexSet(a: number[], b: number[]): boolean {
@@ -38,6 +55,46 @@ function sameIndexSet(a: number[], b: number[]): boolean {
   const sortedA = [...a].sort();
   const sortedB = [...b].sort();
   return sortedA.every((value, i) => value === sortedB[i]);
+}
+
+/**
+ * Corrige un intento de fill_blank hueco a hueco: cada blank se compara contra
+ * su propio `accept[]`/`caseSensitive` (nunca contra los demás huecos). El
+ * ejercicio completo es correcto solo si todos los huecos lo son — sin crédito
+ * parcial, igual que multiple_choice.
+ */
+function correctFillBlank(
+  values: Record<string, string>,
+  solution: FillBlankSolution,
+): {
+  isCorrect: boolean;
+  revealedSolution: Record<string, string[]>;
+  canonicalAnswers: Record<string, string>;
+} {
+  const revealedSolution: Record<string, string[]> = {};
+  const canonicalAnswers: Record<string, string> = {};
+  let isCorrect = true;
+
+  for (const blank of solution.blanks) {
+    const submitted = values[blank.id] ?? '';
+    const options = { caseSensitive: blank.caseSensitive };
+    revealedSolution[blank.id] = blank.accept;
+
+    if (!matchesAccepted(submitted, blank.accept, options)) {
+      isCorrect = false;
+      continue;
+    }
+    const canonical = canonicalFormIfDifferent(
+      submitted,
+      blank.accept,
+      options,
+    );
+    if (canonical) {
+      canonicalAnswers[blank.id] = canonical;
+    }
+  }
+
+  return { isCorrect, revealedSolution, canonicalAnswers };
 }
 
 @Injectable()
@@ -85,17 +142,42 @@ export class ExercisesService {
     if (!exercise) {
       throw new NotFoundException(`Ejercicio "${exerciseId}" no encontrado`);
     }
-    if (exercise.type !== ExerciseType.multiple_choice) {
+
+    let isCorrect: boolean;
+    let revealedSolutionValue: unknown;
+    let canonicalAnswers: Record<string, string> | undefined;
+
+    if (exercise.type === ExerciseType.multiple_choice) {
+      if (!('selectedIndices' in input.answer)) {
+        throw new BadRequestException(
+          'La respuesta no corresponde al tipo "multiple_choice"',
+        );
+      }
+      const solution = exercise.solution as unknown as MultipleChoiceSolution;
+      isCorrect = sameIndexSet(
+        input.answer.selectedIndices,
+        solution.correctIndices,
+      );
+      revealedSolutionValue = solution.correctIndices;
+    } else if (exercise.type === ExerciseType.fill_blank) {
+      if (!('values' in input.answer)) {
+        throw new BadRequestException(
+          'La respuesta no corresponde al tipo "fill_blank"',
+        );
+      }
+      const solution = exercise.solution as unknown as FillBlankSolution;
+      const result = correctFillBlank(input.answer.values, solution);
+      isCorrect = result.isCorrect;
+      revealedSolutionValue = result.revealedSolution;
+      if (Object.keys(result.canonicalAnswers).length > 0) {
+        canonicalAnswers = result.canonicalAnswers;
+      }
+    } else {
       throw new NotImplementedException(
         `Corrección para el tipo "${exercise.type}" aún no implementada en este slice`,
       );
     }
 
-    const solution = exercise.solution as unknown as MultipleChoiceSolution;
-    const isCorrect = sameIndexSet(
-      input.answer.selectedIndices,
-      solution.correctIndices,
-    );
     const userId = await this.currentUser.getUserId();
 
     const attemptNumber = await this.prisma.$transaction(async (tx) => {
@@ -137,7 +219,8 @@ export class ExercisesService {
     return {
       correct: isCorrect,
       attemptNumber,
-      ...(shouldReveal ? { revealedSolution: solution.correctIndices } : {}),
+      ...(shouldReveal ? { revealedSolution: revealedSolutionValue } : {}),
+      ...(isCorrect && canonicalAnswers ? { canonicalAnswers } : {}),
     };
   }
 }

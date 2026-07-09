@@ -22,9 +22,12 @@ export function getExercise(id: string): Promise<PublicExercise> {
   return apiFetch(`/exercises/${id}`);
 }
 
+type Answer =
+  { selectedIndices: number[] } | { values: Record<string, string> };
+
 export function submitAttempt(
   exerciseId: string,
-  body: { answer: { selectedIndices: number[] }; latencyMs: number },
+  body: { answer: Answer; latencyMs: number },
 ): Promise<AttemptResult> {
   return apiFetch(`/exercises/${exerciseId}/attempts`, {
     method: 'POST',
