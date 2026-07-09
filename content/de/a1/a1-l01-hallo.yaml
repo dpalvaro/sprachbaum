@@ -1,0 +1,412 @@
+# Lección 1 de A1 — "Hallo!" (gold standard)
+# Conforme a docs/content-schema-design.md
+# Este fichero es la plantilla de calidad de la que colgará el resto del contenido A1.
+# Nota: los audioUrl están como placeholders; se generan vía TTS en la issue #28.
+
+slug: a1-l01-hallo
+level: A1
+order: 1
+title:
+  es: '¡Hola! Saludos y presentarse'
+  de: 'Hallo!'
+objectives:
+  - es: 'Saludar y despedirte en alemán, formal e informalmente'
+  - es: 'Decir tu nombre y preguntar el de otra persona'
+  - es: 'Presentarte de forma básica (quién eres, de dónde eres)'
+
+sections:
+  # ------------------------------------------------------------------
+  # SECCIÓN 1 — GRAMÁTICA: el verbo sein
+  # ------------------------------------------------------------------
+  - type: grammar
+    slug: l01-grammar-sein
+    title:
+      es: 'El verbo sein y los pronombres personales'
+    explanation:
+      es: >
+        En alemán, el verbo *sein* significa "ser" y "estar" (el alemán no los
+        distingue como el español). Es el verbo más importante para empezar,
+        porque lo usas para presentarte, decir de dónde eres y cómo estás. Es
+        irregular, así que conviene memorizar sus formas desde el principio.
+        Cada forma va con un pronombre personal (ich = yo, du = tú, er/sie/es =
+        él/ella/ello, wir = nosotros, ihr = vosotros, sie/Sie = ellos/usted).
+        Dos claves del alemán desde el minuto uno: (1) *du* es el "tú" informal
+        y *Sie* (siempre en mayúscula) es el "usted" formal; elegir bien es
+        cortesía. (2) En una afirmación el verbo va en segunda posición
+        (*Ich bin Anna*), y en una pregunta de sí/no va primero (*Bist du Anna?*).
+    examples:
+      - de: 'Ich bin Anna.'
+        es: 'Yo soy Anna.'
+      - de: 'Du bist müde.'
+        es: 'Tú estás cansado.'
+      - de: 'Er ist aus Spanien.'
+        es: 'Él es de España.'
+      - de: 'Sind Sie Herr Müller?'
+        es: '¿Es usted el señor Müller?'
+        note:
+          es: 'Pregunta formal: el verbo va primero.'
+      - de: 'Wir sind Studenten.'
+        es: 'Nosotros somos estudiantes.'
+    exercises:
+      - slug: l01-sein-ex01
+        type: multiple_choice
+        prompt:
+          es: '¿Qué forma de sein va con ich?'
+        options: ['bin', 'bist', 'ist', 'sind']
+        correctIndices: [0]
+        skillTag: grammar:sein
+      - slug: l01-sein-ex02
+        type: multiple_choice
+        prompt:
+          es: 'Du ___ aus Deutschland.'
+        options: ['bin', 'bist', 'ist', 'seid']
+        correctIndices: [1]
+        skillTag: grammar:sein
+      - slug: l01-sein-ex03
+        type: fill_blank
+        prompt:
+          es: 'Completa con la forma correcta de sein.'
+        text: 'Ich ___ Student.'
+        blanks:
+          - id: b1
+            accept: ['bin']
+        skillTag: grammar:sein
+      - slug: l01-sein-ex04
+        type: fill_blank
+        prompt:
+          es: 'Completa con la forma correcta de sein.'
+        text: 'Er ___ müde.'
+        blanks:
+          - id: b1
+            accept: ['ist']
+        skillTag: grammar:sein
+      - slug: l01-sein-ex05
+        type: fill_blank
+        prompt:
+          es: 'Completa con la forma correcta de sein.'
+        text: 'Wir ___ aus Spanien.'
+        blanks:
+          - id: b1
+            accept: ['sind']
+        skillTag: grammar:sein
+      - slug: l01-sein-ex06
+        type: fill_blank
+        prompt:
+          es: 'Completa con la forma correcta de sein.'
+        text: 'Ihr ___ Anna und Tom.'
+        blanks:
+          - id: b1
+            accept: ['seid']
+        skillTag: grammar:sein
+      - slug: l01-sein-ex07
+        type: multiple_choice
+        prompt:
+          es: "¿Cuál es la forma formal de 'tú'?"
+        options: ['du', 'Sie', 'ihr', 'er']
+        correctIndices: [1]
+        skillTag: grammar:sein
+      - slug: l01-sein-ex08
+        type: sentence_order
+        prompt:
+          es: 'Ordena las palabras para formar la frase.'
+        fragments: ['Anna', 'bin', 'ich']
+        correctOrder: [2, 1, 0]
+        skillTag: grammar:sein
+      - slug: l01-sein-ex09
+        type: sentence_order
+        prompt:
+          es: 'Ordena las palabras para formar la pregunta.'
+        fragments: ['du', 'müde', 'bist']
+        correctOrder: [2, 0, 1]
+        skillTag: grammar:sein
+      - slug: l01-sein-ex10
+        type: multiple_choice
+        prompt:
+          es: "En 'Ich bin Tom', ¿en qué posición está el verbo?"
+        options: ['primera', 'segunda', 'tercera']
+        correctIndices: [1]
+        skillTag: grammar:sein
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 2 — VOCABULARIO: saludos y cortesía
+  # ------------------------------------------------------------------
+  - type: vocabulary
+    slug: l01-vocab-greetings
+    topic:
+      es: 'Saludos, despedidas y cortesía'
+    items:
+      - slug: voc-hallo
+        lemma: 'hallo'
+        translation: { es: 'hola' }
+        example: 'Hallo, ich bin Anna.'
+        partOfSpeech: phrase
+      - slug: voc-guten-morgen
+        lemma: 'guten Morgen'
+        translation: { es: 'buenos días (por la mañana)' }
+        example: 'Guten Morgen, Herr Müller!'
+        partOfSpeech: phrase
+      - slug: voc-guten-tag
+        lemma: 'guten Tag'
+        translation: { es: 'buenos días / buenas tardes' }
+        example: 'Guten Tag! Wie geht es Ihnen?'
+        partOfSpeech: phrase
+      - slug: voc-guten-abend
+        lemma: 'guten Abend'
+        translation: { es: 'buenas tardes/noches' }
+        example: 'Guten Abend, Frau Klein!'
+        partOfSpeech: phrase
+      - slug: voc-tschuss
+        lemma: 'tschüss'
+        translation: { es: 'adiós (informal)' }
+        example: 'Tschüss, bis morgen!'
+        partOfSpeech: phrase
+      - slug: voc-auf-wiedersehen
+        lemma: 'auf Wiedersehen'
+        translation: { es: 'adiós (formal)' }
+        example: 'Auf Wiedersehen, Herr Braun.'
+        partOfSpeech: phrase
+      - slug: voc-bitte
+        lemma: 'bitte'
+        translation: { es: 'por favor / de nada' }
+        example: 'Ein Kaffee, bitte.'
+        partOfSpeech: other
+      - slug: voc-danke
+        lemma: 'danke'
+        translation: { es: 'gracias' }
+        example: 'Danke schön!'
+        partOfSpeech: other
+      - slug: voc-ja
+        lemma: 'ja'
+        translation: { es: 'sí' }
+        example: 'Ja, ich bin Student.'
+        partOfSpeech: other
+      - slug: voc-nein
+        lemma: 'nein'
+        translation: { es: 'no' }
+        example: 'Nein, ich bin nicht müde.'
+        partOfSpeech: other
+      - slug: voc-name
+        lemma: 'der Name'
+        translation: { es: 'el nombre' }
+        example: 'Mein Name ist Tom.'
+        partOfSpeech: noun
+        gender: der
+        plural: 'Namen'
+      - slug: voc-frau
+        lemma: 'die Frau'
+        translation: { es: 'la señora / la mujer' }
+        example: 'Guten Tag, Frau Klein.'
+        partOfSpeech: noun
+        gender: die
+        plural: 'Frauen'
+      - slug: voc-herr
+        lemma: 'der Herr'
+        translation: { es: 'el señor' }
+        example: 'Guten Tag, Herr Müller.'
+        partOfSpeech: noun
+        gender: der
+        plural: 'Herren'
+      - slug: voc-wie-gehts
+        lemma: "wie geht's?"
+        translation: { es: '¿qué tal? (informal)' }
+        example: "Hallo Anna, wie geht's?"
+        partOfSpeech: phrase
+    exercises:
+      - slug: l01-voc-ex01
+        type: matching
+        prompt:
+          es: 'Empareja cada palabra con su traducción.'
+        pairs:
+          - { left: 'hallo', right: { es: 'hola' } }
+          - { left: 'danke', right: { es: 'gracias' } }
+          - { left: 'tschüss', right: { es: 'adiós' } }
+          - { left: 'bitte', right: { es: 'por favor' } }
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex02
+        type: matching
+        prompt:
+          es: 'Empareja cada expresión con su traducción.'
+        pairs:
+          - { left: 'guten Morgen', right: { es: 'buenos días' } }
+          - { left: 'guten Abend', right: { es: 'buenas noches' } }
+          - { left: 'auf Wiedersehen', right: { es: 'adiós (formal)' } }
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex03
+        type: multiple_choice
+        prompt:
+          es: '¿Cómo te despides formalmente?'
+        options: ['tschüss', 'auf Wiedersehen', 'hallo', 'danke']
+        correctIndices: [1]
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex04
+        type: multiple_choice
+        prompt:
+          es: "___, wie geht's? (saludo informal)"
+        options: ['Hallo', 'Auf Wiedersehen', 'Bitte', 'Danke']
+        correctIndices: [0]
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex05
+        type: fill_blank
+        prompt:
+          es: "Responde a 'Danke' de forma cortés."
+        text: '___ schön!'
+        blanks:
+          - id: b1
+            accept: ['Bitte', 'bitte']
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex06
+        type: multiple_choice
+        prompt:
+          es: 'Es de noche. ¿Qué dices?'
+        options: ['Guten Morgen', 'Guten Abend', 'Gute Nacht', 'Guten Tag']
+        correctIndices: [1]
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex07
+        type: fill_blank
+        prompt:
+          es: 'Saludo de la mañana.'
+        text: 'Guten ___, Herr Müller!'
+        blanks:
+          - id: b1
+            accept: ['Morgen']
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex08
+        type: multiple_choice
+        prompt:
+          es: '¿Cuál es el trato formal para dirigirse a una mujer?'
+        options: ['die Frau', 'Frau', 'das Mädchen', 'die Dame']
+        correctIndices: [1]
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex09
+        type: fill_blank
+        prompt:
+          es: 'Mi nombre es Anna.'
+        text: 'Mein ___ ist Anna.'
+        blanks:
+          - id: b1
+            accept: ['Name']
+        skillTag: vocab:greetings
+      - slug: l01-voc-ex10
+        type: short_answer
+        prompt:
+          es: "¿Cómo se dice 'gracias' en alemán?"
+        accept: ['danke', 'Danke']
+        skillTag: vocab:greetings
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 3 — READING: un diálogo de presentación
+  # ------------------------------------------------------------------
+  - type: reading
+    slug: l01-reading-gespraech
+    title:
+      es: 'Una conversación'
+    text: |
+      — Hallo! Ich bin Anna. Wie ist dein Name?
+      — Guten Tag, Anna. Ich bin Tom.
+      — Freut mich, Tom! Woher bist du?
+      — Ich bin aus München. Und du?
+      — Ich bin aus Madrid, aber ich wohne jetzt in Berlin.
+      — Super! Bist du Studentin?
+      — Ja, ich bin Studentin. Und du bist auch Student, oder?
+      — Nein, ich bin Lehrer.
+      — Ah, interessant! Tschüss, Tom, bis bald!
+      — Tschüss, Anna!
+    glossary:
+      - {
+          term: 'Freut mich',
+          translation: { es: 'encantado/a (de conocerte)' },
+        }
+      - { term: 'woher', translation: { es: 'de dónde' } }
+      - { term: 'aus', translation: { es: 'de (procedencia)' } }
+      - { term: 'aber', translation: { es: 'pero' } }
+      - { term: 'jetzt', translation: { es: 'ahora' } }
+      - { term: 'auch', translation: { es: 'también' } }
+      - { term: 'oder?', translation: { es: '¿verdad? / ¿no?' } }
+      - { term: 'Studentin', translation: { es: 'estudiante (mujer)' } }
+      - { term: 'Lehrer', translation: { es: 'profesor' } }
+      - { term: 'bis bald', translation: { es: 'hasta pronto' } }
+    questions:
+      - slug: l01-read-q01
+        type: multiple_choice
+        prompt:
+          es: '¿De dónde es Tom?'
+        options: ['Madrid', 'München', 'Berlin']
+        correctIndices: [1]
+        skillTag: reading:l01
+      - slug: l01-read-q02
+        type: multiple_choice
+        prompt:
+          es: '¿Dónde vive Anna ahora?'
+        options: ['München', 'Madrid', 'Berlin']
+        correctIndices: [2]
+        skillTag: reading:l01
+      - slug: l01-read-q03
+        type: multiple_choice
+        prompt:
+          es: '¿Qué es Anna?'
+        options: ['Lehrerin', 'Studentin', 'Ärztin']
+        correctIndices: [1]
+        skillTag: reading:l01
+      - slug: l01-read-q04
+        type: multiple_choice
+        prompt:
+          es: '¿Qué es Tom?'
+        options: ['Student', 'Lehrer', 'Kellner']
+        correctIndices: [1]
+        skillTag: reading:l01
+      - slug: l01-read-q05
+        type: short_answer
+        prompt:
+          es: '¿Cómo se despiden? (una palabra)'
+        accept: ['tschüss', 'Tschüss']
+        skillTag: reading:l01
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 4 — LISTENING: presentaciones cortas
+  # ------------------------------------------------------------------
+  - type: listening
+    slug: l01-listening-begruessungen
+    title:
+      es: 'Presentaciones'
+    audio:
+      url: 'PLACEHOLDER_a1-l01-listening.mp3' # generar vía TTS (issue #28)
+      transcriptSlug: l01-listening-transcript
+    transcript: |
+      (Person 1) Guten Tag! Mein Name ist Herr Fischer. Ich bin aus Hamburg. Ich bin Ingenieur.
+      (Person 2) Hallo! Ich bin Lena. Ich bin aus Wien und ich bin Studentin.
+      (Person 3) Guten Abend. Ich heiße Sofia. Ich bin aus Italien, aber ich wohne in Zürich.
+    questions:
+      - slug: l01-listen-q01
+        type: multiple_choice
+        prompt:
+          es: '¿De dónde es Herr Fischer?'
+        options: ['Wien', 'Hamburg', 'Zürich']
+        correctIndices: [1]
+        skillTag: listening:l01
+      - slug: l01-listen-q02
+        type: multiple_choice
+        prompt:
+          es: '¿Qué profesión tiene Herr Fischer?'
+        options: ['Lehrer', 'Ingenieur', 'Student']
+        correctIndices: [1]
+        skillTag: listening:l01
+      - slug: l01-listen-q03
+        type: multiple_choice
+        prompt:
+          es: '¿Qué es Lena?'
+        options: ['Ingenieurin', 'Studentin', 'Lehrerin']
+        correctIndices: [1]
+        skillTag: listening:l01
+      - slug: l01-listen-q04
+        type: multiple_choice
+        prompt:
+          es: '¿Dónde vive Sofia?'
+        options: ['Italien', 'Wien', 'Zürich']
+        correctIndices: [2]
+        skillTag: listening:l01
+      - slug: l01-listen-q05
+        type: short_answer
+        prompt:
+          es: '¿De qué ciudad es Lena?'
+        accept: ['Wien']
+        skillTag: listening:l01
