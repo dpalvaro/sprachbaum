@@ -1,26 +1,97 @@
 @import 'tailwindcss';
 
+/*
+ * Identidad "Sprachbaum": paleta verde/tierra (el árbol del idioma), no el
+ * gris/ámbar por defecto. Tokens crudos aquí; `@theme inline` los expone como
+ * utilidades Tailwind (bg-canvas, text-ink-muted, border-brand-500, etc.) para
+ * que ningún componente vuelva a escribir un color suelto. El modo oscuro
+ * redefine estas mismas variables — los componentes no necesitan `dark:`.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --canvas: #f4f1e6;
+  --surface: #fffcf5;
+  --surface-border: #ddd3b8;
+  --ink: #1f2b22;
+  --ink-muted: #5c6b5f;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --brand-50: #eef6ec;
+  --brand-100: #d7ecd1;
+  --brand-200: #b3d9a8;
+  --brand-300: #8ac378;
+  --brand-400: #63a750;
+  --brand-500: #468a37;
+  --brand-600: #386f2c;
+  --brand-700: #2d5824;
+  --brand-800: #25461e;
+  --brand-900: #1f3a1a;
+
+  --success: var(--brand-600);
+  --success-bg: var(--brand-50);
+  --caution: #a3701f;
+  --caution-bg: #f8ecd4;
+  --danger: #a8432b;
+  --danger-bg: #f7e2da;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --canvas: #121a14;
+    --surface: #1a251c;
+    --surface-border: #2c3a2c;
+    --ink: #eef1ea;
+    --ink-muted: #9fb09f;
+
+    --brand-50: #16241a;
+    --brand-100: #1c2f20;
+    --brand-200: #274128;
+    --brand-300: #3a5c37;
+    --brand-400: #588c4c;
+    --brand-500: #78ab63;
+    --brand-600: #8fc178;
+    --brand-700: #a7d194;
+    --brand-800: #c3e3b4;
+    --brand-900: #def0d3;
+
+    --success: var(--brand-600);
+    --success-bg: #182a1a;
+    --caution: #d9a353;
+    --caution-bg: #2e2412;
+    --danger: #e2795c;
+    --danger-bg: #33201a;
   }
 }
 
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-border: var(--surface-border);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-caution: var(--caution);
+  --color-caution-bg: var(--caution-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  color-scheme: light dark;
 }
