@@ -8,12 +8,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  locale    String   @default("es")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String          @id @default(cuid())
+  email          String          @unique
+  name           String?
+  locale         String          @default("es")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  attempts       Attempt[]
+  learningEvents LearningEvent[]
 }
 
 model Level {
@@ -161,4 +163,44 @@ model Exercise {
   /// Lo que NUNCA se manda al cliente antes de corregir: correctIndices, blanks.accept, correctOrder, expected, accept.
   solution   Json
   difficulty Int?
+  attempts   Attempt[]
+}
+
+/// Un intento de resolución de un Exercise. Hecho crudo (no agregado): a
+/// diferencia de SkillMastery, que se deriva de LearningEvent, attemptNumber
+/// se calcula y graba en el momento del intento porque describe ESE intento,
+/// no una vista recalculable.
+model Attempt {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  exerciseId    String
+  exercise      Exercise @relation(fields: [exerciseId], references: [id])
+  /// 1-based; cuenta intentos previos del mismo (userId, exerciseId) + 1.
+  attemptNumber Int
+  /// Forma dependiente del tipo de ejercicio, p. ej. { selectedIndices: number[] } para multiple_choice.
+  answer        Json
+  isCorrect     Boolean
+  latencyMs     Int
+  createdAt     DateTime @default(now())
+
+  @@index([userId, exerciseId])
+}
+
+enum LearningEventType {
+  EXERCISE_ATTEMPT
+}
+
+/// Append-only: fuente de verdad de la analítica. Nunca se actualiza ni se
+/// borra; SkillMastery y demás vistas se recalculan a partir de estos eventos.
+model LearningEvent {
+  id        String            @id @default(cuid())
+  userId    String
+  user      User              @relation(fields: [userId], references: [id])
+  type      LearningEventType
+  entityId  String
+  data      Json
+  createdAt DateTime          @default(now())
+
+  @@index([userId, type])
 }

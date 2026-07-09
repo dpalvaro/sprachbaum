@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path';
 import { PrismaClient } from '@prisma/client';
 import { loadLessonFile } from '@sprachbaum/content-schema';
 import { buildLessonPlan } from './map-lesson';
+import { seedDevUser } from './seed-dev-user';
 import { seedLesson } from './seed-lesson';
 
 const DEFAULT_CONTENT_DIR = resolve(__dirname, '../../../../content/de/a1');
@@ -25,6 +26,7 @@ export async function run(
 
   const prisma = new PrismaClient();
   try {
+    await seedDevUser(prisma);
     for (const file of files) {
       const lesson = loadLessonFile(file);
       const plan = buildLessonPlan(lesson);
