@@ -12,7 +12,7 @@ import { useExerciseAttempt } from '../../hooks/useExerciseAttempt';
 import { resolveText, type PublicExercise } from '../../lib/types';
 
 interface MultipleChoiceProps {
-  exercise: PublicExercise;
+  exercise: Extract<PublicExercise, { type: 'multiple_choice' }>;
   onAdvance?: () => void;
 }
 
@@ -66,7 +66,11 @@ export function MultipleChoice({ exercise, onAdvance }: MultipleChoiceProps) {
 
   function optionState(index: number): OptionState {
     if (status === 'revealed') {
-      if (lastResult?.revealedSolution?.includes(index)) return 'correct';
+      // Este componente solo corrige multiple_choice: revealedSolution
+      // siempre es number[] aquí (fill_blank usa Record<blankId, string[]>).
+      const correctIndices = lastResult?.revealedSolution as
+        number[] | undefined;
+      if (correctIndices?.includes(index)) return 'correct';
       if (index === selected) return 'incorrect';
       return 'idle';
     }
@@ -95,7 +99,7 @@ export function MultipleChoice({ exercise, onAdvance }: MultipleChoiceProps) {
 
   async function handleSubmit() {
     if (selected === null) return;
-    await submit([selected]);
+    await submit({ selectedIndices: [selected] });
   }
 
   function handleRetry() {

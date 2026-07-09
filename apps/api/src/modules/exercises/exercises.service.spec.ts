@@ -1,4 +1,8 @@
-import { NotFoundException, NotImplementedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  NotImplementedException,
+} from '@nestjs/common';
 import { ExerciseType } from '@prisma/client';
 import { CurrentUserService } from './current-user.provider';
 import { ExercisesService } from './exercises.service';
@@ -24,6 +28,17 @@ describe('ExercisesService', () => {
       type: ExerciseType.multiple_choice,
       skillId: 'skill-1',
       solution: { correctIndices },
+    };
+  }
+
+  function fbExercise(
+    blanks: { id: string; accept: string[]; caseSensitive?: boolean }[],
+  ) {
+    return {
+      id: exerciseId,
+      type: ExerciseType.fill_blank,
+      skillId: 'skill-1',
+      solution: { blanks },
     };
   }
 
@@ -143,9 +158,9 @@ describe('ExercisesService', () => {
   it('throws NotImplementedException for exercise types without correction logic yet', async () => {
     findUnique.mockResolvedValue({
       id: exerciseId,
-      type: ExerciseType.fill_blank,
+      type: ExerciseType.matching,
       skillId: 'skill-1',
-      solution: { blanks: [] },
+      solution: { pairs: [] },
     });
 
     await expect(
@@ -154,6 +169,142 @@ describe('ExercisesService', () => {
         latencyMs: 0,
       }),
     ).rejects.toBeInstanceOf(NotImplementedException);
+  });
+
+  describe('fill_blank', () => {
+    it('marks a single-blank exercise correct on an exact match', async () => {
+      findUnique.mockResolvedValue(fbExercise([{ id: 'b1', accept: ['bin'] }]));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: 'bin' } },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({ correct: true, attemptNumber: 1 });
+    });
+
+    it('is case-insensitive by default', async () => {
+      findUnique.mockResolvedValue(fbExercise([{ id: 'b1', accept: ['bin'] }]));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: 'BIN' } },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(true);
+    });
+
+    it('trims and collapses whitespace without penalizing', async () => {
+      findUnique.mockResolvedValue(fbExercise([{ id: 'b1', accept: ['bin'] }]));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: '  bin  ' } },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(true);
+    });
+
+    it('respects caseSensitive: true for a given blank', async () => {
+      findUnique.mockResolvedValue(
+        fbExercise([{ id: 'b1', accept: ['Anna'], caseSensitive: true }]),
+      );
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: 'anna' } },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(false);
+    });
+
+    it('treats ü/ö/ä/ß as equivalent to ue/oe/ae/ss', async () => {
+      findUnique.mockResolvedValue(
+        fbExercise([{ id: 'b1', accept: ['Tschüss'] }]),
+      );
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: 'Tschuss' } },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(true);
+    });
+
+    it('surfaces the canonical spelling when the digraph equivalence closed the gap', async () => {
+      findUnique.mockResolvedValue(
+        fbExercise([{ id: 'b1', accept: ['Tschüss'] }]),
+      );
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: 'Tschuss' } },
+        latencyMs: 500,
+      });
+
+      expect(result.canonicalAnswers).toEqual({ b1: 'Tschüss' });
+    });
+
+    it('does not surface a canonical spelling when the answer already matches textually', async () => {
+      findUnique.mockResolvedValue(fbExercise([{ id: 'b1', accept: ['bin'] }]));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: 'Bin' } },
+        latencyMs: 500,
+      });
+
+      expect(result).not.toHaveProperty('canonicalAnswers');
+    });
+
+    it('requires every blank to match for a multi-blank exercise to be correct', async () => {
+      findUnique.mockResolvedValue(
+        fbExercise([
+          { id: 'b1', accept: ['bin'] },
+          { id: 'b2', accept: ['Student'] },
+        ]),
+      );
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: 'bin', b2: 'Studentin' } },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(false);
+    });
+
+    it('reveals the accepted forms per blank once the 2nd attempt is also wrong', async () => {
+      findUnique.mockResolvedValue(fbExercise([{ id: 'b1', accept: ['bin'] }]));
+      count.mockResolvedValue(1);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { values: { b1: 'bist' } },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({
+        correct: false,
+        attemptNumber: 2,
+        revealedSolution: { b1: ['bin'] },
+      });
+    });
+
+    it('rejects an answer shape that does not match the fill_blank exercise', async () => {
+      findUnique.mockResolvedValue(fbExercise([{ id: 'b1', accept: ['bin'] }]));
+
+      await expect(
+        service.submitAttempt(exerciseId, {
+          answer: { selectedIndices: [0] },
+          latencyMs: 0,
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
   });
 
   it('getPublicExercise never selects the solution column', async () => {

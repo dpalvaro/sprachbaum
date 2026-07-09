@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { PublicExercise } from '../../lib/types';
+import { FillBlank } from './FillBlank';
 import { MultipleChoice } from './MultipleChoice';
 
 /**
@@ -26,15 +27,19 @@ export function LessonExerciseDemo({ exercise }: { exercise: PublicExercise }) {
     );
   }
 
+  const exerciseType: string = exercise.type;
+
   switch (exercise.type) {
     case 'multiple_choice':
       return (
         <MultipleChoice exercise={exercise} onAdvance={() => setDone(true)} />
       );
+    case 'fill_blank':
+      return <FillBlank exercise={exercise} onAdvance={() => setDone(true)} />;
     default:
       return (
         <p className="text-sm text-ink-muted">
-          Tipo de ejercicio &quot;{exercise.type}&quot; sin componente todavía.
+          Tipo de ejercicio &quot;{exerciseType}&quot; sin componente todavía.
         </p>
       );
   }
