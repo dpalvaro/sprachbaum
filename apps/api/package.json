@@ -23,7 +23,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "dotenv -e ../../.env -- prisma migrate dev",
     "db:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
-    "db:studio": "dotenv -e ../../.env -- prisma studio"
+    "db:studio": "dotenv -e ../../.env -- prisma studio",
+    "content:seed": "dotenv -e ../../.env -- ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -31,6 +32,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.19.3",
     "@sentry/nestjs": "^10.63.0",
+    "@sprachbaum/content-schema": "workspace:*",
     "nestjs-pino": "^4.6.1",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",

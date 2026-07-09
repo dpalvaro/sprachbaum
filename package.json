@@ -16,7 +16,8 @@
     "prepare": "husky || true",
     "db:migrate": "pnpm --filter api db:migrate",
     "db:deploy": "pnpm --filter api db:deploy",
-    "db:studio": "pnpm --filter api db:studio"
+    "db:studio": "pnpm --filter api db:studio",
+    "content:seed": "pnpm --filter api content:seed"
   },
   "devDependencies": {
     "husky": "^9.1.7",
