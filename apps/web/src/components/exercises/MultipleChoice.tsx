@@ -9,11 +9,15 @@ import {
 } from '../ui/exercise-feedback';
 import { SupportText, TargetText } from '../ui/typography';
 import { useExerciseAttempt } from '../../hooks/useExerciseAttempt';
-import { resolveText, type PublicExercise } from '../../lib/types';
+import {
+  resolveText,
+  type ExerciseOutcome,
+  type PublicExercise,
+} from '../../lib/types';
 
 interface MultipleChoiceProps {
   exercise: Extract<PublicExercise, { type: 'multiple_choice' }>;
-  onAdvance?: () => void;
+  onAdvance?: (outcome: ExerciseOutcome) => void;
 }
 
 function CheckIcon() {
@@ -107,6 +111,14 @@ export function MultipleChoice({ exercise, onAdvance }: MultipleChoiceProps) {
     retryAnswering();
   }
 
+  function handleAdvance() {
+    if (!lastResult) return;
+    onAdvance?.({
+      correct: lastResult.correct,
+      attemptNumber: lastResult.attemptNumber,
+    });
+  }
+
   return (
     <div className="w-full max-w-lg rounded-2xl border border-surface-border bg-surface p-6 shadow-sm sm:p-8">
       {skillTag && (
@@ -170,7 +182,7 @@ export function MultipleChoice({ exercise, onAdvance }: MultipleChoiceProps) {
       <FeedbackMessage
         status={status}
         onRetry={handleRetry}
-        onAdvance={onAdvance}
+        onAdvance={handleAdvance}
       />
     </div>
   );

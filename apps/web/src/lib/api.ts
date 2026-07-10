@@ -1,4 +1,9 @@
-import type { AttemptResult, ExerciseListItem, PublicExercise } from './types';
+import type {
+  AttemptResult,
+  ExerciseListItem,
+  PublicExercise,
+  PublicLesson,
+} from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
@@ -16,6 +21,10 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function getLessonExercises(slug: string): Promise<ExerciseListItem[]> {
   return apiFetch(`/lessons/${slug}/exercises`);
+}
+
+export function getLesson(slug: string): Promise<PublicLesson> {
+  return apiFetch(`/lessons/${slug}`);
 }
 
 export function getExercise(id: string): Promise<PublicExercise> {

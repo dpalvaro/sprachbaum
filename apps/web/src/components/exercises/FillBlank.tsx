@@ -10,11 +10,15 @@ import {
 import { GermanKeyboard } from '../ui/GermanKeyboard';
 import { SupportText, TargetText } from '../ui/typography';
 import { useExerciseAttempt } from '../../hooks/useExerciseAttempt';
-import { resolveText, type PublicExercise } from '../../lib/types';
+import {
+  resolveText,
+  type ExerciseOutcome,
+  type PublicExercise,
+} from '../../lib/types';
 
 interface FillBlankProps {
   exercise: Extract<PublicExercise, { type: 'fill_blank' }>;
-  onAdvance?: () => void;
+  onAdvance?: (outcome: ExerciseOutcome) => void;
 }
 
 export function FillBlank({ exercise, onAdvance }: FillBlankProps) {
@@ -81,6 +85,14 @@ export function FillBlank({ exercise, onAdvance }: FillBlankProps) {
   function handleRetry() {
     setValues({});
     retryAnswering();
+  }
+
+  function handleAdvance() {
+    if (!lastResult) return;
+    onAdvance?.({
+      correct: lastResult.correct,
+      attemptNumber: lastResult.attemptNumber,
+    });
   }
 
   return (
@@ -153,7 +165,7 @@ export function FillBlank({ exercise, onAdvance }: FillBlankProps) {
       <FeedbackMessage
         status={status}
         onRetry={handleRetry}
-        onAdvance={onAdvance}
+        onAdvance={handleAdvance}
         detail={feedbackDetail()}
       />
     </div>
