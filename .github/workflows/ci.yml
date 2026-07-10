@@ -77,6 +77,17 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # api importa @sprachbaum/content-schema y @sprachbaum/shared como
+      # dependencias normales (main: dist/index.js), no por su código fuente
+      # — así que hace falta compilarlas antes de que nada las importe
+      # (content:seed, luego la API). `pnpm install` no las construye solo.
+      # `--filter=api^...` compila únicamente las dependencias de api (no
+      # api/web en sí, que corren en modo dev/watch), igual que ya hace el
+      # Dockerfile de producción con `turbo run build --filter=api` (ver
+      # docs/adr/0004): mismo problema que en Render, misma solución.
+      - name: Construir dependencias del workspace (content-schema, shared)
+        run: pnpm exec turbo run build --filter=api^...
+
       # apps/api envuelve sus scripts con `dotenv -e ../../.env --`, así que
       # necesita este fichero además de las env vars del job de arriba (que
       # cubren a Next.js, que lee process.env directamente).
