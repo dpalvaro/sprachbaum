@@ -36,6 +36,84 @@ export type PublicExercise =
       payload: FillBlankPayload;
     };
 
+export interface GrammarExample {
+  de: string;
+  es?: string;
+  note?: LocalizedText;
+}
+
+export interface GlossaryEntry {
+  term: string;
+  translation: LocalizedText;
+}
+
+export interface PublicVocabItem {
+  slug: string;
+  lemma: string;
+  translation: LocalizedText;
+  example: string | null;
+  exampleTranslation: LocalizedText | null;
+  audioUrl: string | null;
+  partOfSpeech: string | null;
+  gender: string | null;
+  plural: string | null;
+}
+
+/**
+ * Espeja la unión discriminada del backend (`LessonsService.PublicSection`).
+ * `exercises` está normalizado en las 4 variantes (el backend ya convierte
+ * `questions` de reading/listening), así que el runner siempre itera un único
+ * campo sin importar el tipo de sección.
+ */
+export type PublicSection =
+  | {
+      type: 'grammar';
+      slug: string;
+      order: number;
+      title: LocalizedText | null;
+      explanation: LocalizedText;
+      examples: GrammarExample[];
+      exercises: PublicExercise[];
+    }
+  | {
+      type: 'vocabulary';
+      slug: string;
+      order: number;
+      topic: LocalizedText;
+      items: PublicVocabItem[];
+      exercises: PublicExercise[];
+    }
+  | {
+      type: 'reading';
+      slug: string;
+      order: number;
+      title: LocalizedText | null;
+      text: string;
+      glossary: GlossaryEntry[];
+      exercises: PublicExercise[];
+    }
+  | {
+      type: 'listening';
+      slug: string;
+      order: number;
+      title: LocalizedText | null;
+      audioUrl: string;
+      transcript: string;
+      exercises: PublicExercise[];
+    };
+
+export interface PublicLesson {
+  slug: string;
+  title: LocalizedText;
+  objectives: LocalizedText[];
+  sections: PublicSection[];
+}
+
+export interface ExerciseOutcome {
+  correct: boolean;
+  attemptNumber: number;
+}
+
 export interface AttemptResult {
   correct: boolean;
   attemptNumber: number;

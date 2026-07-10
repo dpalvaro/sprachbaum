@@ -5,6 +5,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ExercisesModule } from './modules/exercises/exercises.module';
+import { LessonsModule } from './modules/lessons/lessons.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     PrismaModule,
     ExercisesModule,
+    LessonsModule,
   ],
   controllers: [AppController],
   providers: [

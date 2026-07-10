@@ -1,0 +1,35 @@
+import { FillBlank } from '../exercises/FillBlank';
+import { MultipleChoice } from '../exercises/MultipleChoice';
+import type { ExerciseOutcome, PublicExercise } from '../../lib/types';
+
+interface ExerciseScreenProps {
+  exercise: PublicExercise;
+  onAdvance: (outcome: ExerciseOutcome) => void;
+}
+
+/**
+ * `key={exercise.id}` es lo que permite reutilizar MultipleChoice/FillBlank
+ * tal cual sin tocarlos: fuerza a React a remontar el componente (y por tanto
+ * useExerciseAttempt) en cada ejercicio nuevo, en vez de arrastrar el estado
+ * de intento del ejercicio anterior.
+ */
+export function ExerciseScreen({ exercise, onAdvance }: ExerciseScreenProps) {
+  switch (exercise.type) {
+    case 'multiple_choice':
+      return (
+        <MultipleChoice
+          key={exercise.id}
+          exercise={exercise}
+          onAdvance={onAdvance}
+        />
+      );
+    case 'fill_blank':
+      return (
+        <FillBlank
+          key={exercise.id}
+          exercise={exercise}
+          onAdvance={onAdvance}
+        />
+      );
+  }
+}
