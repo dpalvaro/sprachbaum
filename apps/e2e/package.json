@@ -1,0 +1,19 @@
+{
+  "name": "@sprachbaum/e2e",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@playwright/test": "^1.55.1",
+    "@types/node": "^24",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.1.8",
+    "typescript": "^5",
+    "typescript-eslint": "^8.20.0"
+  }
+}

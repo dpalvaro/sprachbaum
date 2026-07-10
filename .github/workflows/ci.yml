@@ -31,3 +31,121 @@ jobs:
       - run: pnpm typecheck
 
       - run: pnpm test
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Sin `needs: ci` a propósito (issue #41): el E2E es un job independiente
+    # que se puede re-ejecutar solo, sin esperar a lint/typecheck/test.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: sprachbaum
+          POSTGRES_PASSWORD: sprachbaum
+          POSTGRES_DB: sprachbaum_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sprachbaum -d sprachbaum_dev"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    # Sin servicio de Redis: nada en apps/api lo usa todavía (ver
+    # apps/api/src). Se añade cuando algo lo consuma de verdad.
+    env:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://sprachbaum:sprachbaum@localhost:5432/sprachbaum_dev
+      API_PORT: 4000
+      WEB_PORT: 3000
+      CORS_ORIGIN: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      NEXT_PUBLIC_SENTRY_DSN_WEB: ''
+      SENTRY_DSN_API: ''
+      PLAYWRIGHT_BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # api importa @sprachbaum/content-schema y @sprachbaum/shared como
+      # dependencias normales (main: dist/index.js), no por su código fuente
+      # — así que hace falta compilarlas antes de que nada las importe
+      # (content:seed, luego la API). `pnpm install` no las construye solo.
+      # `--filter=api^...` compila únicamente las dependencias de api (no
+      # api/web en sí, que corren en modo dev/watch), igual que ya hace el
+      # Dockerfile de producción con `turbo run build --filter=api` (ver
+      # docs/adr/0004): mismo problema que en Render, misma solución.
+      - name: Construir dependencias del workspace (content-schema, shared)
+        run: pnpm exec turbo run build --filter=api^...
+
+      # apps/api envuelve sus scripts con `dotenv -e ../../.env --`, así que
+      # necesita este fichero además de las env vars del job de arriba (que
+      # cubren a Next.js, que lee process.env directamente).
+      - name: Generar .env para la stack
+        run: |
+          cat > .env <<EOF
+          POSTGRES_USER=sprachbaum
+          POSTGRES_PASSWORD=sprachbaum
+          POSTGRES_DB=sprachbaum_dev
+          POSTGRES_PORT=5432
+          REDIS_PORT=6379
+          API_PORT=4000
+          NODE_ENV=development
+          DATABASE_URL=postgresql://sprachbaum:sprachbaum@localhost:5432/sprachbaum_dev
+          CORS_ORIGIN=http://localhost:3000
+          WEB_PORT=3000
+          NEXT_PUBLIC_API_URL=http://localhost:4000
+          EOF
+
+      - run: pnpm db:deploy
+
+      - run: pnpm content:seed
+
+      - name: Instalar navegador de Playwright
+        run: pnpm --filter @sprachbaum/e2e exec playwright install --with-deps chromium
+
+      - name: Arrancar API
+        run: nohup pnpm --filter api dev > api.log 2>&1 &
+
+      - name: Arrancar web
+        run: nohup pnpm --filter web dev > web.log 2>&1 &
+
+      - name: Esperar a que API y web respondan
+        run: |
+          for i in $(seq 1 60); do
+            api_ok=0; web_ok=0
+            curl -sf http://localhost:4000/lessons/a1-l01-hallo > /dev/null && api_ok=1
+            curl -sf http://localhost:3000 > /dev/null && web_ok=1
+            if [ "$api_ok" = "1" ] && [ "$web_ok" = "1" ]; then
+              echo "API y web arriba"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Timeout esperando a API/web"
+          echo "--- api.log ---"; cat api.log || true
+          echo "--- web.log ---"; cat web.log || true
+          exit 1
+
+      - run: pnpm --filter @sprachbaum/e2e test:e2e
+
+      - name: Subir artefactos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            apps/e2e/playwright-report/
+            api.log
+            web.log
+          retention-days: 7

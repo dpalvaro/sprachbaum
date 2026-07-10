@@ -7,6 +7,7 @@
 export default {
   'apps/api/**/*.ts': 'pnpm --filter api exec eslint --fix',
   'apps/web/**/*.{ts,tsx}': 'pnpm --filter web exec eslint --fix',
+  'apps/e2e/**/*.ts': 'pnpm --filter @sprachbaum/e2e exec eslint --fix',
   'packages/shared/**/*.ts':
     'pnpm --filter @sprachbaum/shared exec eslint --fix',
   '**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml}': 'prettier --write',
