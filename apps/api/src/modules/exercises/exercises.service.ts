@@ -5,6 +5,7 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import { ExerciseType, LearningEventType } from '@prisma/client';
+import type { LocalizedText } from '@sprachbaum/content-schema';
 import { canonicalFormIfDifferent, matchesAccepted } from '@sprachbaum/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CurrentUserService } from './current-user.provider';
@@ -31,14 +32,16 @@ export interface AttemptResult {
    * Solo presente si !correct && attemptNumber >= 2 (política de "revela tras
    * el 2º fallo"). Forma depende del tipo: number[] en multiple_choice,
    * Record<blankId, string[]> (formas aceptadas) en fill_blank, number[]
-   * (correctOrder) en sentence_order.
+   * (correctOrder) en sentence_order, string[] (accept) en short_answer,
+   * Record<left, rightText> en matching.
    */
   revealedSolution?: unknown;
   /**
    * Solo presente si correct && el usuario escribió una variante ASCII
    * (ue/oe/ae/ss) de una forma con diéresis/ß. Permite mostrar "Se escribe:
-   * Tschüss" sin penalizar por no tener teclado alemán. Hoy solo lo rellena
-   * fill_blank.
+   * Tschüss" sin penalizar por no tener teclado alemán. fill_blank lo indexa
+   * por blank.id; short_answer usa la clave fija "value" (solo hay una
+   * respuesta, no huecos que distinguir).
    */
   canonicalAnswers?: Record<string, string>;
 }
@@ -53,6 +56,25 @@ interface FillBlankSolution {
 
 interface SentenceOrderSolution {
   correctOrder: number[];
+}
+
+interface ShortAnswerSolution {
+  accept: string[];
+  caseSensitive?: boolean;
+}
+
+interface MatchingSolution {
+  pairs: { left: string; right: LocalizedText }[];
+}
+
+interface MatchingPayload {
+  rights: LocalizedText[];
+  [key: string]: unknown;
+}
+
+/** Misma prioridad es→de que usa el frontend para mostrar un LocalizedText. */
+function resolveLocalized(text: LocalizedText): string {
+  return text.es ?? text.de ?? '';
 }
 
 function sameIndexSet(a: number[], b: number[]): boolean {
@@ -132,6 +154,89 @@ function correctFillBlank(
   return { isCorrect, revealedSolution, canonicalAnswers };
 }
 
+/**
+ * short_answer es un fill_blank de un único hueco sin frase alrededor: misma
+ * política de normalización (matchesAccepted/canonicalFormIfDifferent), solo
+ * que aquí no hay `blank.id` que indexar porque solo hay una respuesta.
+ */
+function correctShortAnswer(
+  value: string,
+  solution: ShortAnswerSolution,
+): {
+  isCorrect: boolean;
+  canonicalAnswer?: string;
+} {
+  const options = { caseSensitive: solution.caseSensitive };
+  const isCorrect = matchesAccepted(value, solution.accept, options);
+  if (!isCorrect) {
+    return { isCorrect };
+  }
+  const canonicalAnswer = canonicalFormIfDifferent(
+    value,
+    solution.accept,
+    options,
+  );
+  return { isCorrect, canonicalAnswer };
+}
+
+/**
+ * matches está keyed por el `left` tal cual (string plano) y valorado por el
+ * texto resuelto del `right` que el usuario le asignó — no por índice ni
+ * posición, así que es indiferente en qué orden se sirvió `payload.rights`
+ * (ver shuffleMatchingRights). Todo-o-nada: correcto solo si cada `left` de
+ * la solución tiene una entrada y resuelve al `right` correcto, igual que
+ * fill_blank/multiple_choice.
+ */
+function correctMatching(
+  matches: Record<string, string>,
+  solution: MatchingSolution,
+): {
+  isCorrect: boolean;
+  revealedSolution: Record<string, string>;
+} {
+  const revealedSolution: Record<string, string> = {};
+  let isCorrect = true;
+
+  for (const pair of solution.pairs) {
+    const correctRight = resolveLocalized(pair.right);
+    revealedSolution[pair.left] = correctRight;
+    if (matches[pair.left] !== correctRight) {
+      isCorrect = false;
+    }
+  }
+
+  return { isCorrect, revealedSolution };
+}
+
+function fisherYates<T>(items: T[]): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+/**
+ * Baraja `payload.rights` con Fisher-Yates en cada respuesta del servidor, no
+ * una vez en el seed: así ninguna carga de la lección repite el mismo orden
+ * (reintentar el mismo ejercicio no memoriza posiciones). La corrección
+ * (correctMatching) compara por valor, nunca por posición, así que el
+ * resultado de este shuffle es puramente de presentación. Una repetición por
+ * azar de un tramo sin reordenar (incluida, en el caso límite, la identidad)
+ * es la varianza esperada de un shuffle genuino, no un caso a evitar.
+ */
+export function shuffleMatchingRights(
+  exercise: PublicExercise,
+): PublicExercise {
+  if (exercise.type !== ExerciseType.matching) return exercise;
+  const payload = exercise.payload as MatchingPayload;
+  return {
+    ...exercise,
+    payload: { ...payload, rights: fisherYates(payload.rights) },
+  };
+}
+
 @Injectable()
 export class ExercisesService {
   constructor(
@@ -162,7 +267,7 @@ export class ExercisesService {
     if (!exercise) {
       throw new NotFoundException(`Ejercicio "${id}" no encontrado`);
     }
-    return exercise;
+    return shuffleMatchingRights(exercise);
   }
 
   async submitAttempt(
@@ -223,6 +328,29 @@ export class ExercisesService {
       }
       isCorrect = correctSentenceOrder(input.answer.order, solution);
       revealedSolutionValue = solution.correctOrder;
+    } else if (exercise.type === ExerciseType.short_answer) {
+      if (!('value' in input.answer)) {
+        throw new BadRequestException(
+          'La respuesta no corresponde al tipo "short_answer"',
+        );
+      }
+      const solution = exercise.solution as unknown as ShortAnswerSolution;
+      const result = correctShortAnswer(input.answer.value, solution);
+      isCorrect = result.isCorrect;
+      revealedSolutionValue = solution.accept;
+      if (result.canonicalAnswer) {
+        canonicalAnswers = { value: result.canonicalAnswer };
+      }
+    } else if (exercise.type === ExerciseType.matching) {
+      if (!('matches' in input.answer)) {
+        throw new BadRequestException(
+          'La respuesta no corresponde al tipo "matching"',
+        );
+      }
+      const solution = exercise.solution as unknown as MatchingSolution;
+      const result = correctMatching(input.answer.matches, solution);
+      isCorrect = result.isCorrect;
+      revealedSolutionValue = result.revealedSolution;
     } else {
       throw new NotImplementedException(
         `Corrección para el tipo "${exercise.type}" aún no implementada en este slice`,

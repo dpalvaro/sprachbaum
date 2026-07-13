@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SectionType } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
-import type { PublicExercise } from '../exercises/exercises.service';
+import {
+  shuffleMatchingRights,
+  type PublicExercise,
+} from '../exercises/exercises.service';
 
 export interface LocalizedText {
   es?: string;
@@ -121,7 +124,11 @@ function mapVocabItem(item: RawVocabItem): PublicVocabItem {
  * Traduce una fila de `Section` (con su `content` Json opaco) a la forma
  * pública discriminada. `content` nunca incluye datos de corrección: solo
  * prosa/ejemplos/vocabulario, ya separados de `solution` desde el seed
- * (ver map-lesson.ts::sectionContent).
+ * (ver map-lesson.ts::sectionContent). `shuffleMatchingRights` se aplica aquí
+ * (no una vez en el seed) porque este es uno de los dos puntos por los que un
+ * `payload` de `matching` llega al cliente — el otro es
+ * ExercisesService.getPublicExercise — así que cada carga de la lección sirve
+ * un orden nuevo.
  */
 function mapSection(section: RawSection): PublicSection {
   const title = section.title as LocalizedText | null;
@@ -139,7 +146,7 @@ function mapSection(section: RawSection): PublicSection {
         title,
         explanation: content.explanation,
         examples: content.examples,
-        exercises: section.exercises,
+        exercises: section.exercises.map(shuffleMatchingRights),
       };
     }
     case SectionType.vocabulary: {
@@ -150,7 +157,7 @@ function mapSection(section: RawSection): PublicSection {
         order: section.order,
         topic: content.topic,
         items: section.vocabItems.map(mapVocabItem),
-        exercises: section.exercises,
+        exercises: section.exercises.map(shuffleMatchingRights),
       };
     }
     case SectionType.reading: {
@@ -165,7 +172,7 @@ function mapSection(section: RawSection): PublicSection {
         title,
         text: content.text,
         glossary: content.glossary,
-        exercises: section.exercises,
+        exercises: section.exercises.map(shuffleMatchingRights),
       };
     }
     case SectionType.listening: {
@@ -180,7 +187,7 @@ function mapSection(section: RawSection): PublicSection {
         title,
         audioUrl: content.audio.url,
         transcript: content.transcript,
-        exercises: section.exercises,
+        exercises: section.exercises.map(shuffleMatchingRights),
       };
     }
   }

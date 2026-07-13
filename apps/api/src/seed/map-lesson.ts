@@ -96,10 +96,12 @@ function exercisesOf(section: Section): Exercise[] {
  * Separa lo que el cliente puede ver antes de responder ("payload") de lo que
  * solo el corrector del servidor debe conocer ("solution"). Caso especial:
  * `matching`, donde el YAML ya empareja lado a lado la respuesta correcta, así
- * que el payload separa ambos lados (y desalinea su índice) mientras que
- * `solution.pairs` guarda la correspondencia real — el corrector empareja por
- * valor, no por posición, así que el orden de payload.rights es irrelevante
- * para la corrección.
+ * que el payload separa ambos lados mientras que `solution.pairs` guarda la
+ * correspondencia real — el corrector empareja por valor, no por posición.
+ * `rights` se guarda aquí en orden canónico (igual que `lefts`): el mezclado
+ * real ocurre en cada respuesta del servidor (shuffleMatchingRights en
+ * exercises.service.ts), no aquí en el seed — así cada carga de la lección
+ * sirve un orden distinto, en vez de uno fijo desde el momento del seed.
  */
 function splitExercise(exercise: Exercise): {
   payload: unknown;
@@ -127,7 +129,7 @@ function splitExercise(exercise: Exercise): {
         payload: {
           ...base,
           lefts: exercise.pairs.map((pair) => pair.left),
-          rights: exercise.pairs.map((pair) => pair.right).reverse(),
+          rights: exercise.pairs.map((pair) => pair.right),
         },
         solution: { pairs: exercise.pairs },
       };

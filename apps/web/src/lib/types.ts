@@ -28,6 +28,21 @@ export interface SentenceOrderPayload {
   fragments: string[];
 }
 
+export interface ShortAnswerPayload {
+  prompt: LocalizedText;
+  skillTag: string | null;
+}
+
+export interface MatchingPayload {
+  prompt: LocalizedText;
+  skillTag: string | null;
+  lefts: string[];
+  /** Orden barajado por el servidor en cada respuesta (ver
+   * shuffleMatchingRights en el backend) — nunca fiable como pista de
+   * emparejamiento, solo de presentación. */
+  rights: LocalizedText[];
+}
+
 export type PublicExercise =
   | {
       id: string;
@@ -46,6 +61,18 @@ export type PublicExercise =
       type: 'sentence_order';
       order: number;
       payload: SentenceOrderPayload;
+    }
+  | {
+      id: string;
+      type: 'short_answer';
+      order: number;
+      payload: ShortAnswerPayload;
+    }
+  | {
+      id: string;
+      type: 'matching';
+      order: number;
+      payload: MatchingPayload;
     };
 
 export interface GrammarExample {
@@ -131,10 +158,13 @@ export interface AttemptResult {
   attemptNumber: number;
   /** Solo presente si el intento falló y ya van 2 o más fallos. number[] en
    * multiple_choice (índices correctos) y en sentence_order (correctOrder);
-   * Record<blankId, string[]> (formas aceptadas) en fill_blank. */
-  revealedSolution?: number[] | Record<string, string[]>;
+   * Record<blankId, string[]> (formas aceptadas) en fill_blank; string[]
+   * (accept) en short_answer; Record<left, rightText> en matching. */
+  revealedSolution?:
+    number[] | string[] | Record<string, string[]> | Record<string, string>;
   /** Solo presente si el intento fue correcto y difería ortográficamente de la
-   * forma canónica (equivalencia ä/ö/ü/ß). Hoy solo lo rellena fill_blank. */
+   * forma canónica (equivalencia ä/ö/ü/ß). fill_blank la indexa por blank.id;
+   * short_answer usa la clave fija "value". */
   canonicalAnswers?: Record<string, string>;
 }
 

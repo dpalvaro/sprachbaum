@@ -34,7 +34,9 @@ export function getExercise(id: string): Promise<PublicExercise> {
 type Answer =
   | { selectedIndices: number[] }
   | { values: Record<string, string> }
-  | { order: number[] };
+  | { order: number[] }
+  | { value: string }
+  | { matches: Record<string, string> };
 
 export function submitAttempt(
   exerciseId: string,

@@ -219,11 +219,17 @@ describe('buildLessonPlan', () => {
       expect(ex.solution).toEqual({ correctIndices: [0] });
     });
 
-    it('matching: payload never has left/right aligned at the same index as an answer key', () => {
+    it('matching: payload keeps lefts/rights in canonical (pairs) order — the anti-alignment shuffle happens per request, not at seed time', () => {
+      // Ver ExercisesService.shuffleMatchingRights: el barajado real (para que
+      // ninguna carga de la lección repita el mismo orden) ocurre en cada
+      // respuesta del servidor, no aquí. El seed guarda el orden canónico y
+      // la corrección compara por valor, así que este orden es irrelevante
+      // para la corrección — solo importa que exista un shuffle dinámico
+      // aguas abajo.
       const ex = bySlug.get('l00-match')!;
       const payload = ex.payload as { lefts: string[]; rights: unknown[] };
       expect(payload.lefts).toEqual(['hallo', 'danke']);
-      expect(payload.rights).toEqual([{ es: 'gracias' }, { es: 'hola' }]);
+      expect(payload.rights).toEqual([{ es: 'hola' }, { es: 'gracias' }]);
       expect(ex.solution).toEqual({
         pairs: [
           { left: 'hallo', right: { es: 'hola' } },
