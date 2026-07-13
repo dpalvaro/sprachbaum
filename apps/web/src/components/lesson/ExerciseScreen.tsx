@@ -1,5 +1,6 @@
 import { FillBlank } from '../exercises/FillBlank';
 import { MultipleChoice } from '../exercises/MultipleChoice';
+import { SentenceOrder } from '../exercises/SentenceOrder';
 import type { ExerciseOutcome, PublicExercise } from '../../lib/types';
 
 interface ExerciseScreenProps {
@@ -26,6 +27,14 @@ export function ExerciseScreen({ exercise, onAdvance }: ExerciseScreenProps) {
     case 'fill_blank':
       return (
         <FillBlank
+          key={exercise.id}
+          exercise={exercise}
+          onAdvance={onAdvance}
+        />
+      );
+    case 'sentence_order':
+      return (
+        <SentenceOrder
           key={exercise.id}
           exercise={exercise}
           onAdvance={onAdvance}

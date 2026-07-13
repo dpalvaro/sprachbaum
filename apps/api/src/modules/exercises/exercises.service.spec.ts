@@ -42,6 +42,15 @@ describe('ExercisesService', () => {
     };
   }
 
+  function soExercise(correctOrder: number[]) {
+    return {
+      id: exerciseId,
+      type: ExerciseType.sentence_order,
+      skillId: 'skill-1',
+      solution: { correctOrder },
+    };
+  }
+
   beforeEach(() => {
     findUnique = jest.fn();
     count = jest.fn();
@@ -304,6 +313,81 @@ describe('ExercisesService', () => {
           latencyMs: 0,
         }),
       ).rejects.toBeInstanceOf(BadRequestException);
+    });
+  });
+
+  describe('sentence_order', () => {
+    it('marks the answer correct when order matches correctOrder exactly', async () => {
+      findUnique.mockResolvedValue(soExercise([2, 1, 0]));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { order: [2, 1, 0] },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({ correct: true, attemptNumber: 1 });
+    });
+
+    it('treats order as positional: same fragments in the wrong sequence are incorrect', async () => {
+      findUnique.mockResolvedValue(soExercise([2, 1, 0]));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { order: [0, 1, 2] },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(false);
+    });
+
+    it('rejects an answer shape that does not match sentence_order', async () => {
+      findUnique.mockResolvedValue(soExercise([2, 1, 0]));
+
+      await expect(
+        service.submitAttempt(exerciseId, {
+          answer: { selectedIndices: [0] },
+          latencyMs: 0,
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('rejects an order that is not a valid permutation of the fragment indices', async () => {
+      findUnique.mockResolvedValue(soExercise([2, 1, 0]));
+
+      await expect(
+        service.submitAttempt(exerciseId, {
+          answer: { order: [0, 0, 1] },
+          latencyMs: 0,
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('rejects an order with the wrong length', async () => {
+      findUnique.mockResolvedValue(soExercise([2, 1, 0]));
+
+      await expect(
+        service.submitAttempt(exerciseId, {
+          answer: { order: [0, 1] },
+          latencyMs: 0,
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('reveals correctOrder once the 2nd attempt is also wrong', async () => {
+      findUnique.mockResolvedValue(soExercise([2, 1, 0]));
+      count.mockResolvedValue(1);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { order: [0, 1, 2] },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({
+        correct: false,
+        attemptNumber: 2,
+        revealedSolution: [2, 1, 0],
+      });
     });
   });
 

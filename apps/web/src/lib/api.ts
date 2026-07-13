@@ -32,7 +32,9 @@ export function getExercise(id: string): Promise<PublicExercise> {
 }
 
 type Answer =
-  { selectedIndices: number[] } | { values: Record<string, string> };
+  | { selectedIndices: number[] }
+  | { values: Record<string, string> }
+  | { order: number[] };
 
 export function submitAttempt(
   exerciseId: string,
