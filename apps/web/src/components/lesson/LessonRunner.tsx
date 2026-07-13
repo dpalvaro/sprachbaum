@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useReducer } from 'react';
+import { useEffect, useMemo, useReducer, useRef } from 'react';
+import { completeLesson } from '../../lib/api';
 import {
   buildRunnableSections,
   initialRunnerState,
@@ -29,6 +30,18 @@ export function LessonRunner({ lesson }: { lesson: PublicLesson }) {
   );
 
   const current = state.sections[state.sectionIndex];
+
+  // Dispara la generación de SrsCard (E5) en cuanto se llega al resumen. El
+  // ref evita reintentos en re-renders: una vez enviado, no se repite aunque
+  // el usuario deje la pestaña abierta en la pantalla de resumen.
+  const completionSent = useRef(false);
+  useEffect(() => {
+    if (state.phase !== 'summary' || completionSent.current) return;
+    completionSent.current = true;
+    completeLesson(lesson.slug).catch(() => {
+      completionSent.current = false;
+    });
+  }, [state.phase, lesson.slug]);
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-6 bg-canvas px-6 py-16">

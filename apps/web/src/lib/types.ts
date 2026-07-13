@@ -174,3 +174,29 @@ export function resolveText(
 ): string {
   return value[locale] ?? value.es ?? value.de ?? '';
 }
+
+export type SrsCardState = 'New' | 'Learning' | 'Review' | 'Relearning';
+
+export type SrsRating = 'again' | 'hard' | 'good' | 'easy';
+
+export interface SrsCardPublic {
+  id: string;
+  state: SrsCardState;
+  due: string;
+  vocabItem: PublicVocabItem;
+}
+
+export interface SrsSessionResponse {
+  due: SrsCardPublic[];
+  new: SrsCardPublic[];
+}
+
+export interface SrsReviewResult {
+  cardId: string;
+  state: SrsCardState;
+  due: string;
+}
+
+export interface CompleteLessonResult {
+  vocabCount: number;
+}

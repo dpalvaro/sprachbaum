@@ -1,6 +1,8 @@
 import { NotFoundException } from '@nestjs/common';
 import { SectionType } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CurrentUserService } from '../exercises/current-user.provider';
+import type { SrsService } from '../srs/srs.service';
 import { LessonsService } from './lessons.service';
 
 /** Forma mínima del argumento de `prisma.lesson.findUnique` que este spec
@@ -26,7 +28,13 @@ describe('LessonsService', () => {
   beforeEach(() => {
     findUnique = jest.fn<Promise<unknown>, [LessonFindUniqueArgs]>();
     prisma = { lesson: { findUnique } } as unknown as PrismaService;
-    service = new LessonsService(prisma);
+    const currentUser = {
+      getUserId: jest.fn().mockResolvedValue('user-1'),
+    } as unknown as CurrentUserService;
+    const srs = {
+      generateCardsForLesson: jest.fn().mockResolvedValue(0),
+    } as unknown as SrsService;
+    service = new LessonsService(prisma, currentUser, srs);
   });
 
   it('throws NotFoundException when the lesson does not exist', async () => {

@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { SectionType } from '@prisma/client';
+import { LearningEventType, SectionType } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CurrentUserService } from '../exercises/current-user.provider';
 import {
   shuffleMatchingRights,
   type PublicExercise,
 } from '../exercises/exercises.service';
+import { SrsService } from '../srs/srs.service';
 
 export interface LocalizedText {
   es?: string;
@@ -82,6 +84,10 @@ export interface PublicLesson {
   title: LocalizedText;
   objectives: LocalizedText[];
   sections: PublicSection[];
+}
+
+export interface CompleteLessonResult {
+  vocabCount: number;
 }
 
 interface RawVocabItem {
@@ -195,7 +201,11 @@ function mapSection(section: RawSection): PublicSection {
 
 @Injectable()
 export class LessonsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly currentUser: CurrentUserService,
+    private readonly srs: SrsService,
+  ) {}
 
   async getLessonBySlug(slug: string): Promise<PublicLesson> {
     const lesson = await this.prisma.lesson.findUnique({
@@ -245,5 +255,41 @@ export class LessonsService {
       objectives: lesson.objectives as LocalizedText[],
       sections: lesson.sections.map(mapSection),
     };
+  }
+
+  /**
+   * Dispara la generación de SrsCard (E5): emite LESSON_COMPLETED y genera una
+   * tarjeta por cada VocabItem de la lección, dentro de la misma transacción.
+   * Idempotente — llamarlo dos veces no duplica tarjetas (ver
+   * SrsService.generateCardsForLesson), aunque sí añade un LearningEvent por
+   * cada llamada (hecho crudo: cada "lección marcada como completa" es un
+   * evento real, no una vista derivable).
+   */
+  async completeLesson(slug: string): Promise<CompleteLessonResult> {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    if (!lesson) {
+      throw new NotFoundException(`Lección "${slug}" no encontrada`);
+    }
+    const userId = await this.currentUser.getUserId();
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.learningEvent.create({
+        data: {
+          userId,
+          type: LearningEventType.LESSON_COMPLETED,
+          entityId: lesson.id,
+          data: {},
+        },
+      });
+      const vocabCount = await this.srs.generateCardsForLesson(
+        tx,
+        userId,
+        lesson.id,
+      );
+      return { vocabCount };
+    });
   }
 }
