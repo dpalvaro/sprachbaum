@@ -5,10 +5,16 @@ import type { PublicExercise, PublicLesson, PublicSection } from './types';
  * ExercisesService.submitAttempt). El runner filtra cualquier otro tipo de su
  * recorrido — se documenta explícitamente en vez de fallar o mostrar un
  * "no disponible": esta lista crece a medida que se implemente cada
- * corrector nuevo (matching, short_answer, dictation).
+ * corrector nuevo (dictation es el único que queda).
  */
 export const SUPPORTED_EXERCISE_TYPES: ReadonlySet<PublicExercise['type']> =
-  new Set(['multiple_choice', 'fill_blank', 'sentence_order']);
+  new Set([
+    'multiple_choice',
+    'fill_blank',
+    'sentence_order',
+    'short_answer',
+    'matching',
+  ]);
 
 /**
  * Alcance de esta versión del runner (issue #39): solo grammar y vocabulary.

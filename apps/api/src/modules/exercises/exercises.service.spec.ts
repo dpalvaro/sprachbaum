@@ -51,6 +51,24 @@ describe('ExercisesService', () => {
     };
   }
 
+  function saExercise(accept: string[], caseSensitive?: boolean) {
+    return {
+      id: exerciseId,
+      type: ExerciseType.short_answer,
+      skillId: 'skill-1',
+      solution: { accept, caseSensitive },
+    };
+  }
+
+  function mExercise(pairs: { left: string; right: { es: string } }[]) {
+    return {
+      id: exerciseId,
+      type: ExerciseType.matching,
+      skillId: 'skill-1',
+      solution: { pairs },
+    };
+  }
+
   beforeEach(() => {
     findUnique = jest.fn();
     count = jest.fn();
@@ -167,9 +185,9 @@ describe('ExercisesService', () => {
   it('throws NotImplementedException for exercise types without correction logic yet', async () => {
     findUnique.mockResolvedValue({
       id: exerciseId,
-      type: ExerciseType.matching,
+      type: ExerciseType.dictation,
       skillId: 'skill-1',
-      solution: { pairs: [] },
+      solution: { expected: 'Hallo' },
     });
 
     await expect(
@@ -388,6 +406,276 @@ describe('ExercisesService', () => {
         attemptNumber: 2,
         revealedSolution: [2, 1, 0],
       });
+    });
+  });
+
+  describe('short_answer', () => {
+    it('marks the answer correct on an exact match', async () => {
+      findUnique.mockResolvedValue(saExercise(['danke', 'Danke']));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: 'danke' },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({ correct: true, attemptNumber: 1 });
+    });
+
+    it('is case-insensitive by default', async () => {
+      findUnique.mockResolvedValue(saExercise(['danke']));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: 'DANKE' },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(true);
+    });
+
+    it('trims and collapses whitespace without penalizing', async () => {
+      findUnique.mockResolvedValue(saExercise(['danke']));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: '  danke  ' },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(true);
+    });
+
+    it('respects caseSensitive: true', async () => {
+      findUnique.mockResolvedValue(saExercise(['Danke'], true));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: 'danke' },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(false);
+    });
+
+    it('treats ü/ö/ä/ß as equivalent to ue/oe/ae/ss', async () => {
+      findUnique.mockResolvedValue(saExercise(['Tschüss']));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: 'Tschuss' },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(true);
+    });
+
+    it('surfaces the canonical spelling under the "value" key when the digraph equivalence closed the gap', async () => {
+      findUnique.mockResolvedValue(saExercise(['Tschüss']));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: 'Tschuss' },
+        latencyMs: 500,
+      });
+
+      expect(result.canonicalAnswers).toEqual({ value: 'Tschüss' });
+    });
+
+    it('does not surface a canonical spelling when the answer already matches textually', async () => {
+      findUnique.mockResolvedValue(saExercise(['danke']));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: 'Danke' },
+        latencyMs: 500,
+      });
+
+      expect(result).not.toHaveProperty('canonicalAnswers');
+    });
+
+    it('does not reveal the solution on the first wrong attempt', async () => {
+      findUnique.mockResolvedValue(saExercise(['danke']));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: 'bitte' },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({ correct: false, attemptNumber: 1 });
+      expect(result).not.toHaveProperty('revealedSolution');
+    });
+
+    it('reveals the accepted forms once the 2nd attempt is also wrong', async () => {
+      findUnique.mockResolvedValue(saExercise(['danke', 'Danke']));
+      count.mockResolvedValue(1);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { value: 'bitte' },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({
+        correct: false,
+        attemptNumber: 2,
+        revealedSolution: ['danke', 'Danke'],
+      });
+    });
+
+    it('rejects an answer shape that does not match short_answer', async () => {
+      findUnique.mockResolvedValue(saExercise(['danke']));
+
+      await expect(
+        service.submitAttempt(exerciseId, {
+          answer: { selectedIndices: [0] },
+          latencyMs: 0,
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+  });
+
+  describe('matching', () => {
+    const pairs = [
+      { left: 'hallo', right: { es: 'hola' } },
+      { left: 'danke', right: { es: 'gracias' } },
+      { left: 'tschüss', right: { es: 'adiós' } },
+    ];
+
+    it('marks the answer correct when every left resolves to its right text', async () => {
+      findUnique.mockResolvedValue(mExercise(pairs));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: {
+          matches: { hallo: 'hola', danke: 'gracias', tschüss: 'adiós' },
+        },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({ correct: true, attemptNumber: 1 });
+    });
+
+    it('requires every pair to match: one wrong pairing fails the whole exercise', async () => {
+      findUnique.mockResolvedValue(mExercise(pairs));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: {
+          // hallo↔danke swapped
+          matches: { hallo: 'gracias', danke: 'hola', tschüss: 'adiós' },
+        },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(false);
+    });
+
+    it('is incorrect when a left is missing from matches', async () => {
+      findUnique.mockResolvedValue(mExercise(pairs));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: { matches: { hallo: 'hola', danke: 'gracias' } },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(false);
+    });
+
+    it('is indifferent to the order the pairs were declared in solution.pairs', async () => {
+      findUnique.mockResolvedValue(mExercise([...pairs].reverse()));
+      count.mockResolvedValue(0);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: {
+          matches: { hallo: 'hola', danke: 'gracias', tschüss: 'adiós' },
+        },
+        latencyMs: 500,
+      });
+
+      expect(result.correct).toBe(true);
+    });
+
+    it('reveals the correct right text per left once the 2nd attempt is also wrong', async () => {
+      findUnique.mockResolvedValue(mExercise(pairs));
+      count.mockResolvedValue(1);
+
+      const result = await service.submitAttempt(exerciseId, {
+        answer: {
+          matches: { hallo: 'gracias', danke: 'hola', tschüss: 'adiós' },
+        },
+        latencyMs: 500,
+      });
+
+      expect(result).toEqual({
+        correct: false,
+        attemptNumber: 2,
+        revealedSolution: { hallo: 'hola', danke: 'gracias', tschüss: 'adiós' },
+      });
+    });
+
+    it('rejects an answer shape that does not match matching', async () => {
+      findUnique.mockResolvedValue(mExercise(pairs));
+
+      await expect(
+        service.submitAttempt(exerciseId, {
+          answer: { selectedIndices: [0] },
+          latencyMs: 0,
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+  });
+
+  describe('getPublicExercise / shuffleMatchingRights', () => {
+    it('serves matching payload.rights as a shuffled permutation, never the stored order alone', async () => {
+      const rights = [
+        { es: 'hola' },
+        { es: 'gracias' },
+        { es: 'adiós' },
+        { es: 'por favor' },
+        { es: 'buenos días' },
+        { es: 'buenas noches' },
+      ];
+      findUnique.mockResolvedValue({
+        id: exerciseId,
+        type: ExerciseType.matching,
+        order: 0,
+        payload: { lefts: ['a', 'b', 'c', 'd', 'e', 'f'], rights },
+      });
+
+      const result = await service.getPublicExercise(exerciseId);
+
+      const servedRights = (result.payload as { rights: { es: string }[] })
+        .rights;
+      expect(servedRights).toHaveLength(rights.length);
+      // Mismo multiconjunto de elementos, sin importar el orden.
+      expect(
+        [...servedRights].sort((a, b) => a.es.localeCompare(b.es)),
+      ).toEqual([...rights].sort((a, b) => a.es.localeCompare(b.es)));
+      // lefts no se toca: solo rights se baraja.
+      expect((result.payload as { lefts: string[] }).lefts).toEqual([
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+      ]);
+    });
+
+    it('does not touch payload for non-matching exercise types', async () => {
+      const payload = { options: ['a', 'b'] };
+      findUnique.mockResolvedValue({
+        id: exerciseId,
+        type: ExerciseType.multiple_choice,
+        order: 0,
+        payload,
+      });
+
+      const result = await service.getPublicExercise(exerciseId);
+
+      expect(result.payload).toEqual(payload);
     });
   });
 

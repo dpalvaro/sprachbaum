@@ -148,6 +148,54 @@ describe('LessonsService', () => {
     });
   });
 
+  it("shuffles matching payload.rights (as a permutation) within a section's exercises", async () => {
+    const rights = [
+      { es: 'hola' },
+      { es: 'gracias' },
+      { es: 'adiós' },
+      { es: 'por favor' },
+      { es: 'buenos días' },
+      { es: 'buenas noches' },
+    ];
+    findUnique.mockResolvedValue({
+      slug: 'a1-l01-hallo',
+      title: { es: 'Hallo' },
+      objectives: [{ es: 'Saludar' }],
+      sections: [
+        {
+          slug: 'l01-vocab-greetings',
+          type: SectionType.vocabulary,
+          order: 1,
+          title: null,
+          content: { topic: { es: 'Saludos' } },
+          vocabItems: [],
+          exercises: [
+            {
+              id: 'ex-matching',
+              type: 'matching',
+              order: 0,
+              payload: {
+                lefts: ['a', 'b', 'c', 'd', 'e', 'f'],
+                rights,
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    const lesson = await service.getLessonBySlug('a1-l01-hallo');
+
+    const exercise = lesson.sections[0].exercises[0] as {
+      payload: { lefts: string[]; rights: { es: string }[] };
+    };
+    expect(exercise.payload.lefts).toEqual(['a', 'b', 'c', 'd', 'e', 'f']);
+    expect(exercise.payload.rights).toHaveLength(rights.length);
+    expect(
+      [...exercise.payload.rights].sort((x, y) => x.es.localeCompare(y.es)),
+    ).toEqual([...rights].sort((x, y) => x.es.localeCompare(y.es)));
+  });
+
   it('normalizes reading/listening "questions" to "exercises" on the wire', async () => {
     findUnique.mockResolvedValue({
       slug: 'a1-l01-hallo',
