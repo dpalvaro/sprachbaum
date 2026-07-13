@@ -1,8 +1,12 @@
 import type {
   AttemptResult,
+  CompleteLessonResult,
   ExerciseListItem,
   PublicExercise,
   PublicLesson,
+  SrsRating,
+  SrsReviewResult,
+  SrsSessionResponse,
 } from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
@@ -43,6 +47,25 @@ export function submitAttempt(
   body: { answer: Answer; latencyMs: number },
 ): Promise<AttemptResult> {
   return apiFetch(`/exercises/${exerciseId}/attempts`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
+export function completeLesson(slug: string): Promise<CompleteLessonResult> {
+  return apiFetch(`/lessons/${slug}/complete`, { method: 'POST' });
+}
+
+export function getSrsSession(): Promise<SrsSessionResponse> {
+  return apiFetch('/srs/session');
+}
+
+export function submitReview(body: {
+  cardId: string;
+  rating: SrsRating;
+  latencyMs: number;
+}): Promise<SrsReviewResult> {
+  return apiFetch('/srs/review', {
     method: 'POST',
     body: JSON.stringify(body),
   });

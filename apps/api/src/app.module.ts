@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ExercisesModule } from './modules/exercises/exercises.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
+import { SrsModule } from './modules/srs/srs.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { PrismaModule } from './prisma/prisma.module';
     PrismaModule,
     ExercisesModule,
     LessonsModule,
+    SrsModule,
   ],
   controllers: [AppController],
   providers: [

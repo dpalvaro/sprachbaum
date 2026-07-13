@@ -16,6 +16,7 @@ model User {
   updatedAt      DateTime        @updatedAt
   attempts       Attempt[]
   learningEvents LearningEvent[]
+  srsCards       SrsCard[]
 }
 
 model Level {
@@ -135,6 +136,43 @@ model VocabItem {
   gender             VocabGender?
   plural             String?
   order              Int
+  srsCards           SrsCard[]
+}
+
+/// Mapea 1:1 el enum `State` de ts-fsrs (New/Learning/Review/Relearning).
+enum SrsCardState {
+  New
+  Learning
+  Review
+  Relearning
+}
+
+/// Estado FSRS por (usuario, VocabItem) — 1 tarjeta por par, generada al
+/// completar la lección que contiene ese VocabItem (ver
+/// LessonsService.completeLesson). Los campos calcan el `Card` de ts-fsrs
+/// (stability/difficulty/due/reps/lapses/state/last_review) para que la
+/// conversión Prisma↔FSRS sea un mapeo directo, sin traducir semántica.
+model SrsCard {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  vocabItemId   String
+  vocabItem     VocabItem    @relation(fields: [vocabItemId], references: [id])
+  due           DateTime
+  stability     Float
+  difficulty    Float
+  elapsedDays   Int
+  scheduledDays Int
+  learningSteps Int
+  reps          Int
+  lapses        Int
+  state         SrsCardState
+  lastReview    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([userId, vocabItemId])
+  @@index([userId, due])
 }
 
 /// Tipo de ejercicio tal cual el discriminante del YAML (content-schema `ExerciseSchema`).
@@ -189,6 +227,8 @@ model Attempt {
 
 enum LearningEventType {
   EXERCISE_ATTEMPT
+  LESSON_COMPLETED
+  SRS_REVIEW
 }
 
 /// Append-only: fuente de verdad de la analítica. Nunca se actualiza ni se
