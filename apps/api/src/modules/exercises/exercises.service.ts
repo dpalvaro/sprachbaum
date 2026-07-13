@@ -30,7 +30,8 @@ export interface AttemptResult {
   /**
    * Solo presente si !correct && attemptNumber >= 2 (política de "revela tras
    * el 2º fallo"). Forma depende del tipo: number[] en multiple_choice,
-   * Record<blankId, string[]> (formas aceptadas) en fill_blank.
+   * Record<blankId, string[]> (formas aceptadas) en fill_blank, number[]
+   * (correctOrder) en sentence_order.
    */
   revealedSolution?: unknown;
   /**
@@ -50,11 +51,45 @@ interface FillBlankSolution {
   blanks: { id: string; accept: string[]; caseSensitive?: boolean }[];
 }
 
+interface SentenceOrderSolution {
+  correctOrder: number[];
+}
+
 function sameIndexSet(a: number[], b: number[]): boolean {
   if (a.length !== b.length) return false;
   const sortedA = [...a].sort();
   const sortedB = [...b].sort();
   return sortedA.every((value, i) => value === sortedB[i]);
+}
+
+/**
+ * `order` debe ser una permutación de 0..correctOrder.length-1: mismos
+ * valores que valida content-schema en el YAML (superRefine de
+ * SentenceOrderExerciseSchema), pero aquí sobre el intento del usuario, no
+ * sobre el contenido — un cliente mal formado podría mandar índices
+ * repetidos o fuera de rango.
+ */
+function isValidOrderShape(order: number[], fragmentCount: number): boolean {
+  return (
+    order.length === fragmentCount &&
+    new Set(order).size === order.length &&
+    order.every((index) => index >= 0 && index < fragmentCount)
+  );
+}
+
+/**
+ * A diferencia de multiple_choice (sameIndexSet, orden-independiente), en
+ * sentence_order el orden es el propio contenido de la respuesta: se compara
+ * posición a posición contra correctOrder, sin crédito parcial.
+ */
+function correctSentenceOrder(
+  order: number[],
+  solution: SentenceOrderSolution,
+): boolean {
+  return (
+    order.length === solution.correctOrder.length &&
+    order.every((value, i) => value === solution.correctOrder[i])
+  );
 }
 
 /**
@@ -172,6 +207,22 @@ export class ExercisesService {
       if (Object.keys(result.canonicalAnswers).length > 0) {
         canonicalAnswers = result.canonicalAnswers;
       }
+    } else if (exercise.type === ExerciseType.sentence_order) {
+      if (!('order' in input.answer)) {
+        throw new BadRequestException(
+          'La respuesta no corresponde al tipo "sentence_order"',
+        );
+      }
+      const solution = exercise.solution as unknown as SentenceOrderSolution;
+      if (
+        !isValidOrderShape(input.answer.order, solution.correctOrder.length)
+      ) {
+        throw new BadRequestException(
+          'order debe ser una permutación de los índices de fragments',
+        );
+      }
+      isCorrect = correctSentenceOrder(input.answer.order, solution);
+      revealedSolutionValue = solution.correctOrder;
     } else {
       throw new NotImplementedException(
         `Corrección para el tipo "${exercise.type}" aún no implementada en este slice`,
