@@ -1,20 +1,22 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * Camino feliz de la lección a1-l01-hallo (issue #41): portada → teoría
- * grammar → ejercicios (todos correctos) → teoría vocabulary → ejercicios
- * (todos correctos) → resumen. Casos borde (fallar, reveal, saltar teoría
- * distinto de "saltar siempre") quedan fuera de este spec a propósito.
+ * Camino feliz de la lección a1-l01-hallo (issue #41, extendido en #37):
+ * portada → teoría grammar → ejercicios → teoría vocabulary → ejercicios →
+ * lectura (glosario tap-to-translate) → preguntas de comprensión → resumen.
+ * Casos borde (fallar, reveal, saltar teoría distinto de "saltar siempre")
+ * quedan fuera de este spec a propósito. listening queda fuera del runner
+ * por alcance (issue #38, depende de TTS), no por tipo de ejercicio sin
+ * corrección.
  *
  * Las respuestas están transcritas de content/de/a1/a1-l01-hallo.yaml. El
  * runner (apps/web/src/lib/lesson-runner.ts) corrige los seis tipos que hoy
  * cubre SUPPORTED_EXERCISE_TYPES (multiple_choice, fill_blank,
  * sentence_order, short_answer, matching), así que el test interactúa con
- * los 10 ejercicios de gramática y los 10 de vocabulario: la lección 1 se
- * juega completa (reading/listening quedan fuera del runner por alcance,
- * issue #37/#38, no por tipo de ejercicio sin corrección). Si se edita ese
- * YAML (texto de opciones, orden, respuestas), este test hay que
- * actualizarlo a la vez.
+ * los 10 ejercicios de gramática, los 10 de vocabulario y las 5 preguntas de
+ * comprensión de reading: la lección 1 se juega completa salvo listening. Si
+ * se edita ese YAML (texto de opciones, orden, respuestas, texto o glosario
+ * de la lectura), este test hay que actualizarlo a la vez.
  */
 
 type Answer =
@@ -73,6 +75,14 @@ const VOCAB_ANSWERS: Answer[] = [
   { kind: 'multiple_choice', optionText: 'Frau' }, // l01-voc-ex08
   { kind: 'fill_blank', value: 'Name' }, // l01-voc-ex09
   { kind: 'short_answer', value: 'danke' }, // l01-voc-ex10
+];
+
+const READING_ANSWERS: Answer[] = [
+  { kind: 'multiple_choice', optionText: 'München' }, // l01-read-q01
+  { kind: 'multiple_choice', optionText: 'Berlin' }, // l01-read-q02
+  { kind: 'multiple_choice', optionText: 'Studentin' }, // l01-read-q03
+  { kind: 'multiple_choice', optionText: 'Lehrer' }, // l01-read-q04
+  { kind: 'short_answer', value: 'tschüss' }, // l01-read-q05
 ];
 
 async function answerCorrectly(page: Page, answer: Answer): Promise<void> {
@@ -134,7 +144,18 @@ test('recorre la lección a1-l01-hallo completa respondiendo bien', async ({
     await answerCorrectly(page, answer);
   }
 
+  // Lectura: el glosario tap-to-translate revela la traducción en línea al
+  // tocar una palabra marcada, sin navegar fuera de la pantalla de lectura.
+  await page.getByRole('button', { name: 'aber', exact: true }).click();
+  await expect(page.getByText('(pero)')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Saltar a los ejercicios' }).click();
+  for (const answer of READING_ANSWERS) {
+    await answerCorrectly(page, answer);
+  }
+
   await expect(page.getByText('¡Lección completada!')).toBeVisible();
-  const total = GRAMMAR_ANSWERS.length + VOCAB_ANSWERS.length;
+  const total =
+    GRAMMAR_ANSWERS.length + VOCAB_ANSWERS.length + READING_ANSWERS.length;
   await expect(page.getByText(`${total}/${total}`)).toBeVisible();
 });

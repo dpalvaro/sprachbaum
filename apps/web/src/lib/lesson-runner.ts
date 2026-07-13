@@ -17,12 +17,13 @@ export const SUPPORTED_EXERCISE_TYPES: ReadonlySet<PublicExercise['type']> =
   ]);
 
 /**
- * Alcance de esta versión del runner (issue #39): solo grammar y vocabulary.
- * reading/listening llegan con #37/#38, reutilizando este mismo runner.
+ * Alcance de esta versión del runner: grammar, vocabulary y reading (#37).
+ * listening llega con #38, reutilizando este mismo runner.
  */
 const RUNNABLE_SECTION_TYPES: ReadonlySet<PublicSection['type']> = new Set([
   'grammar',
   'vocabulary',
+  'reading',
 ]);
 
 export interface ExerciseResult {
