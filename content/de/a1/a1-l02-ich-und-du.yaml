@@ -1,0 +1,491 @@
+# Lección 2 de A1 — "Ich und du" (Datos personales)
+# Conforme a docs/content-schema-design.md, siguiendo el gold standard de a1-l01-hallo.yaml
+# Nota: audioUrl del listening es placeholder; se genera vía TTS en la issue #28.
+# Pendiente de validación nativa (issue #30), como todo el contenido A1.
+
+slug: a1-l02-ich-und-du
+level: A1
+order: 2
+title:
+  es: "Yo y tú: datos personales"
+  de: "Ich und du"
+objectives:
+  - es: "Dar y pedir información personal (procedencia, dónde vives, idiomas)"
+  - es: "Conjugar verbos regulares en presente"
+  - es: "Formular preguntas con las W-Fragen (wie, woher, wo, was, wer)"
+
+sections:
+  # ------------------------------------------------------------------
+  # SECCIÓN 1 — GRAMÁTICA: verbos regulares en presente
+  # ------------------------------------------------------------------
+  - type: grammar
+    slug: l02-grammar-present-regular
+    title:
+      es: "Verbos regulares en presente"
+    explanation:
+      es: >
+        En la lección anterior aprendiste *sein* (ser/estar), que es irregular.
+        Ahora toca la mayoría de los verbos alemanes: los regulares, que siguen
+        todos el mismo patrón fácil. Tomas la raíz del verbo (el infinitivo sin
+        la terminación -en) y le añades una terminación según quién hace la
+        acción. Por ejemplo, *wohnen* (vivir) → raíz *wohn-*: ich wohne, du
+        wohnst, er/sie/es wohnt, wir wohnen, ihr wohnt, sie/Sie wohnen. Este
+        patrón funciona con casi todos los verbos: kommen (venir), heißen
+        (llamarse), lernen (aprender), arbeiten (trabajar). El verbo *sprechen*
+        (hablar) cambia un poco la raíz (ich spreche, du sprichst) — lo verás
+        en detalle más adelante, pero sus terminaciones son las mismas.
+    examples:
+      - de: "Ich wohne in Berlin."
+        es: "Vivo en Berlín."
+      - de: "Woher kommst du?"
+        es: "¿De dónde vienes?"
+      - de: "Sie heißt Anna."
+        es: "Ella se llama Anna."
+      - de: "Wir lernen Deutsch."
+        es: "Aprendemos alemán."
+      - de: "Er arbeitet in München."
+        es: "Él trabaja en Múnich."
+    exercises:
+      - slug: l02-pres-ex01
+        type: multiple_choice
+        prompt: { es: "¿Qué terminación va con ich?" }
+        options: ["-e", "-st", "-t", "-en"]
+        correctIndices: [0]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex02
+        type: multiple_choice
+        prompt: { es: "Du ___ in Hamburg. (wohnen)" }
+        options: ["wohne", "wohnst", "wohnt", "wohnen"]
+        correctIndices: [1]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex03
+        type: fill_blank
+        prompt: { es: "Completa con kommen." }
+        text: "Ich ___ aus Spanien."
+        blanks:
+          - id: b1
+            accept: ["komme"]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex04
+        type: fill_blank
+        prompt: { es: "Completa con lernen." }
+        text: "Wir ___ Deutsch."
+        blanks:
+          - id: b1
+            accept: ["lernen"]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex05
+        type: fill_blank
+        prompt: { es: "Completa con heißen (ella)." }
+        text: "Sie ___ Anna."
+        blanks:
+          - id: b1
+            accept: ["heißt", "heisst"]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex06
+        type: fill_blank
+        prompt: { es: "Completa con wohnen." }
+        text: "Ihr ___ in Berlin."
+        blanks:
+          - id: b1
+            accept: ["wohnt"]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex07
+        type: multiple_choice
+        prompt: { es: "Er ___ in München. (arbeiten)" }
+        options: ["arbeite", "arbeitest", "arbeitet", "arbeiten"]
+        correctIndices: [2]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex08
+        type: sentence_order
+        prompt: { es: "Ordena las palabras para formar la frase." }
+        fragments: ["in", "wohne", "Berlin", "ich"]
+        correctOrder: [3, 1, 0, 2]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex09
+        type: fill_blank
+        prompt: { es: "Completa con sprechen (tú). Ojo: cambia la raíz." }
+        text: "___ du Deutsch?"
+        blanks:
+          - id: b1
+            accept: ["Sprichst"]
+        skillTag: grammar:present-regular
+      - slug: l02-pres-ex10
+        type: short_answer
+        prompt: { es: "Conjuga kommen para wir." }
+        accept: ["kommen"]
+        skillTag: grammar:present-regular
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 2 — GRAMÁTICA: las W-Fragen
+  # ------------------------------------------------------------------
+  - type: grammar
+    slug: l02-grammar-w-questions
+    title:
+      es: "Preguntar con las W-Fragen"
+    explanation:
+      es: >
+        Ya sabes conjugar verbos. Ahora vas a hacer preguntas para pedir
+        información personal. En alemán, muchas palabras interrogativas empiezan
+        por W (por eso se llaman W-Fragen). Las principales: *wie* (cómo),
+        *woher* (de dónde), *wo* (dónde), *was* (qué), *wer* (quién). La
+        estructura es fácil de recordar: palabra-W + verbo + sujeto, con el
+        verbo siempre en segunda posición. Por ejemplo: *Wo wohnst du?*
+        (¿Dónde vives?). Cuidado con no confundir *wo* (dónde) con *woher*
+        (de dónde): woher pregunta por el origen.
+    examples:
+      - de: "Wie heißt du?"
+        es: "¿Cómo te llamas?"
+      - de: "Woher kommst du?"
+        es: "¿De dónde vienes?"
+      - de: "Wo wohnst du?"
+        es: "¿Dónde vives?"
+      - de: "Was sprichst du?"
+        es: "¿Qué (idioma) hablas?"
+      - de: "Wer ist das?"
+        es: "¿Quién es ese/esa?"
+    exercises:
+      - slug: l02-wq-ex01
+        type: multiple_choice
+        prompt: { es: "¿Qué palabra significa 'de dónde'?" }
+        options: ["wie", "wo", "woher", "was"]
+        correctIndices: [2]
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex02
+        type: multiple_choice
+        prompt: { es: "___ heißt du? (¿Cómo te llamas?)" }
+        options: ["Wie", "Wo", "Woher", "Wer"]
+        correctIndices: [0]
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex03
+        type: fill_blank
+        prompt: { es: "¿Dónde vives?" }
+        text: "___ wohnst du?"
+        blanks:
+          - id: b1
+            accept: ["Wo"]
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex04
+        type: fill_blank
+        prompt: { es: "¿De dónde vienes?" }
+        text: "___ kommst du?"
+        blanks:
+          - id: b1
+            accept: ["Woher"]
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex05
+        type: multiple_choice
+        prompt: { es: "___ ist das? (¿Quién es?)" }
+        options: ["Wie", "Was", "Wer", "Wo"]
+        correctIndices: [2]
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex06
+        type: matching
+        prompt: { es: "Empareja cada palabra interrogativa con su traducción." }
+        pairs:
+          - { left: "wie", right: { es: "cómo" } }
+          - { left: "wo", right: { es: "dónde" } }
+          - { left: "woher", right: { es: "de dónde" } }
+          - { left: "was", right: { es: "qué" } }
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex07
+        type: sentence_order
+        prompt: { es: "Ordena la pregunta." }
+        fragments: ["du", "wo", "wohnst"]
+        correctOrder: [1, 2, 0]
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex08
+        type: sentence_order
+        prompt: { es: "Ordena la pregunta." }
+        fragments: ["kommst", "woher", "du"]
+        correctOrder: [1, 0, 2]
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex09
+        type: fill_blank
+        prompt: { es: "Completa con la W correcta. Respuesta: 'Ich spreche Spanisch.'" }
+        text: "___ sprichst du?"
+        blanks:
+          - id: b1
+            accept: ["Was"]
+        skillTag: grammar:w-questions
+      - slug: l02-wq-ex10
+        type: multiple_choice
+        prompt: { es: "En 'Wo wohnst du?', ¿en qué posición va el verbo?" }
+        options: ["primera", "segunda", "tercera"]
+        correctIndices: [1]
+        skillTag: grammar:w-questions
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 3 — VOCABULARIO: datos personales, países e idiomas
+  # ------------------------------------------------------------------
+  - type: vocabulary
+    slug: l02-vocab-personal-data
+    topic:
+      es: "Datos personales, países e idiomas"
+    items:
+      - slug: voc-wohnen
+        lemma: "wohnen"
+        translation: { es: "vivir" }
+        example: "Ich wohne in Berlin."
+        partOfSpeech: verb
+      - slug: voc-kommen
+        lemma: "kommen"
+        translation: { es: "venir" }
+        example: "Ich komme aus Spanien."
+        partOfSpeech: verb
+      - slug: voc-heissen
+        lemma: "heißen"
+        translation: { es: "llamarse" }
+        example: "Wie heißt du?"
+        partOfSpeech: verb
+      - slug: voc-sprechen
+        lemma: "sprechen"
+        translation: { es: "hablar" }
+        example: "Sprichst du Deutsch?"
+        partOfSpeech: verb
+      - slug: voc-lernen
+        lemma: "lernen"
+        translation: { es: "aprender" }
+        example: "Wir lernen Deutsch."
+        partOfSpeech: verb
+      - slug: voc-arbeiten
+        lemma: "arbeiten"
+        translation: { es: "trabajar" }
+        example: "Er arbeitet in München."
+        partOfSpeech: verb
+      - slug: voc-land
+        lemma: "das Land"
+        translation: { es: "el país" }
+        example: "Welches Land ist das?"
+        partOfSpeech: noun
+        gender: das
+        plural: "Länder"
+      - slug: voc-sprache
+        lemma: "die Sprache"
+        translation: { es: "el idioma / la lengua" }
+        example: "Deutsch ist eine schöne Sprache."
+        partOfSpeech: noun
+        gender: die
+        plural: "Sprachen"
+      - slug: voc-stadt
+        lemma: "die Stadt"
+        translation: { es: "la ciudad" }
+        example: "Berlin ist eine große Stadt."
+        partOfSpeech: noun
+        gender: die
+        plural: "Städte"
+      - slug: voc-deutschland
+        lemma: "Deutschland"
+        translation: { es: "Alemania" }
+        example: "Ich komme aus Deutschland."
+        partOfSpeech: other
+      - slug: voc-spanien
+        lemma: "Spanien"
+        translation: { es: "España" }
+        example: "Sie kommt aus Spanien."
+        partOfSpeech: other
+      - slug: voc-schweiz
+        lemma: "die Schweiz"
+        translation: { es: "Suiza (lleva artículo: in der Schweiz)" }
+        example: "Er wohnt in der Schweiz."
+        partOfSpeech: other
+      - slug: voc-deutsch
+        lemma: "Deutsch"
+        translation: { es: "alemán (idioma)" }
+        example: "Ich lerne Deutsch."
+        partOfSpeech: other
+      - slug: voc-spanisch
+        lemma: "Spanisch"
+        translation: { es: "español (idioma)" }
+        example: "Ich spreche Spanisch."
+        partOfSpeech: other
+      - slug: voc-englisch
+        lemma: "Englisch"
+        translation: { es: "inglés (idioma)" }
+        example: "Sprichst du Englisch?"
+        partOfSpeech: other
+      - slug: voc-adresse
+        lemma: "die Adresse"
+        translation: { es: "la dirección" }
+        example: "Wie ist deine Adresse?"
+        partOfSpeech: noun
+        gender: die
+        plural: "Adressen"
+    exercises:
+      - slug: l02-voc-ex01
+        type: matching
+        prompt: { es: "Empareja cada verbo con su traducción." }
+        pairs:
+          - { left: "wohnen", right: { es: "vivir" } }
+          - { left: "kommen", right: { es: "venir" } }
+          - { left: "lernen", right: { es: "aprender" } }
+          - { left: "arbeiten", right: { es: "trabajar" } }
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex02
+        type: matching
+        prompt: { es: "Empareja cada palabra con su traducción." }
+        pairs:
+          - { left: "das Land", right: { es: "el país" } }
+          - { left: "die Sprache", right: { es: "el idioma" } }
+          - { left: "die Stadt", right: { es: "la ciudad" } }
+          - { left: "die Adresse", right: { es: "la dirección" } }
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex03
+        type: multiple_choice
+        prompt: { es: "¿Cómo se dice 'España' en alemán?" }
+        options: ["Deutschland", "Spanien", "die Schweiz", "Englisch"]
+        correctIndices: [1]
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex04
+        type: fill_blank
+        prompt: { es: "Ich spreche ___. (español, el idioma)" }
+        text: "Ich spreche ___."
+        blanks:
+          - id: b1
+            accept: ["Spanisch"]
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex05
+        type: multiple_choice
+        prompt: { es: "¿Qué país lleva artículo (die)?" }
+        options: ["Deutschland", "Spanien", "die Schweiz", "Englisch"]
+        correctIndices: [2]
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex06
+        type: fill_blank
+        prompt: { es: "Er wohnt in ___ Schweiz. (el artículo correcto; dativo con in)" }
+        text: "Er wohnt in ___ Schweiz."
+        blanks:
+          - id: b1
+            accept: ["der"]
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex07
+        type: multiple_choice
+        prompt: { es: "Berlin ist eine große ___." }
+        options: ["Land", "Stadt", "Sprache", "Adresse"]
+        correctIndices: [1]
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex08
+        type: short_answer
+        prompt: { es: "¿Cómo se dice 'aprender' en alemán?" }
+        accept: ["lernen"]
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex09
+        type: fill_blank
+        prompt: { es: "Wie ist deine ___? (tu dirección)" }
+        text: "Wie ist deine ___?"
+        blanks:
+          - id: b1
+            accept: ["Adresse"]
+        skillTag: vocab:personal-data
+      - slug: l02-voc-ex10
+        type: multiple_choice
+        prompt: { es: "¿Qué idioma es 'Englisch'?" }
+        options: ["alemán", "español", "inglés", "francés"]
+        correctIndices: [2]
+        skillTag: vocab:personal-data
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 4 — READING: un perfil personal
+  # ------------------------------------------------------------------
+  - type: reading
+    slug: l02-reading-profil
+    title:
+      es: "Un perfil personal"
+    text: |
+      Hallo! Ich heiße Laura und ich komme aus Spanien. Ich wohne jetzt in Zürich, in der Schweiz. Ich arbeite hier als Ingenieurin und ich lerne Deutsch.
+
+      Ich spreche Spanisch, Englisch und ein bisschen Deutsch. Deutsch ist nicht einfach, aber sehr interessant!
+
+      Meine Adresse ist Bahnhofstraße 12, Zürich. Und du? Woher kommst du? Wo wohnst du? Was sprichst du?
+    glossary:
+      - { term: "jetzt", translation: { es: "ahora" } }
+      - { term: "hier", translation: { es: "aquí" } }
+      - { term: "als", translation: { es: "como (en calidad de)" } }
+      - { term: "Ingenieurin", translation: { es: "ingeniera" } }
+      - { term: "ein bisschen", translation: { es: "un poco" } }
+      - { term: "nicht", translation: { es: "no" } }
+      - { term: "einfach", translation: { es: "fácil / sencillo" } }
+      - { term: "sehr", translation: { es: "muy" } }
+      - { term: "interessant", translation: { es: "interesante" } }
+      - { term: "meine", translation: { es: "mi (posesivo)" } }
+      - { term: "Bahnhofstraße", translation: { es: "calle de la estación (nombre de calle)" } }
+    questions:
+      - slug: l02-read-q01
+        type: multiple_choice
+        prompt: { es: "¿De dónde viene Laura?" }
+        options: ["der Schweiz", "Spanien", "Deutschland"]
+        correctIndices: [1]
+        skillTag: reading:l02
+      - slug: l02-read-q02
+        type: multiple_choice
+        prompt: { es: "¿Dónde vive ahora?" }
+        options: ["Madrid", "Berlin", "Zürich"]
+        correctIndices: [2]
+        skillTag: reading:l02
+      - slug: l02-read-q03
+        type: multiple_choice
+        prompt: { es: "¿Qué profesión tiene?" }
+        options: ["Lehrerin", "Ingenieurin", "Studentin"]
+        correctIndices: [1]
+        skillTag: reading:l02
+      - slug: l02-read-q04
+        type: short_answer
+        prompt: { es: "¿Qué idioma está aprendiendo Laura? (una palabra)" }
+        accept: ["Deutsch"]
+        skillTag: reading:l02
+      - slug: l02-read-q05
+        type: multiple_choice
+        prompt: { es: "¿Cómo describe Laura el alemán?" }
+        options: ["einfach", "langweilig", "interessant"]
+        correctIndices: [2]
+        skillTag: reading:l02
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 5 — LISTENING: una entrevista
+  # ------------------------------------------------------------------
+  - type: listening
+    slug: l02-listening-interview
+    title:
+      es: "Una entrevista"
+    audio:
+      url: "PLACEHOLDER_a1-l02-listening.mp3"   # generar vía TTS (issue #28)
+      transcriptSlug: l02-listening-transcript
+    transcript: |
+      (Interviewer) Guten Tag! Wie heißen Sie?
+      (Frau Meyer) Guten Tag. Ich heiße Sabine Meyer.
+      (Interviewer) Woher kommen Sie, Frau Meyer?
+      (Frau Meyer) Ich komme aus Österreich, aus Wien. Aber ich wohne jetzt in München.
+      (Interviewer) Und was machen Sie in München?
+      (Frau Meyer) Ich arbeite als Lehrerin und ich lerne Italienisch.
+      (Interviewer) Sehr schön! Welche Sprachen sprechen Sie?
+      (Frau Meyer) Ich spreche Deutsch, Englisch und ein bisschen Italienisch.
+    questions:
+      - slug: l02-listen-q01
+        type: multiple_choice
+        prompt: { es: "¿Cómo se llama la mujer?" }
+        options: ["Sabine Müller", "Sabine Meyer", "Sabine Klein"]
+        correctIndices: [1]
+        skillTag: listening:l02
+      - slug: l02-listen-q02
+        type: multiple_choice
+        prompt: { es: "¿De dónde viene?" }
+        options: ["Deutschland", "Österreich", "die Schweiz"]
+        correctIndices: [1]
+        skillTag: listening:l02
+      - slug: l02-listen-q03
+        type: multiple_choice
+        prompt: { es: "¿Dónde vive ahora?" }
+        options: ["Wien", "München", "Berlin"]
+        correctIndices: [1]
+        skillTag: listening:l02
+      - slug: l02-listen-q04
+        type: multiple_choice
+        prompt: { es: "¿Qué profesión tiene?" }
+        options: ["Ingenieurin", "Studentin", "Lehrerin"]
+        correctIndices: [2]
+        skillTag: listening:l02
+      - slug: l02-listen-q05
+        type: short_answer
+        prompt: { es: "¿Qué idioma está aprendiendo? (una palabra)" }
+        accept: ["Italienisch"]
+        skillTag: listening:l02
