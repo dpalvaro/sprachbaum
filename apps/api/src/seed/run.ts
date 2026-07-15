@@ -26,13 +26,21 @@ export async function run(
 
   const prisma = new PrismaClient();
   try {
+    // Contra Neon, la primera query del run puede tener que despertar el
+    // compute suspendido (varios segundos). Se paga aquí, fuera de cualquier
+    // transacción, para no consumir el timeout de la transacción de la
+    // primera lección (ver seed-lesson.ts).
+    await prisma.$queryRaw`SELECT 1`;
+
     await seedDevUser(prisma);
     for (const file of files) {
       const lesson = loadLessonFile(file);
       const plan = buildLessonPlan(lesson);
+      const start = Date.now();
       await seedLesson(prisma, plan);
+      const durationMs = Date.now() - start;
       console.log(
-        `✔ ${plan.slug} (${plan.sections.length} secciones, ${plan.exercises.length} ejercicios, ${plan.vocabItems.length} vocab items)`,
+        `✔ ${plan.slug} (${plan.sections.length} secciones, ${plan.exercises.length} ejercicios, ${plan.vocabItems.length} vocab items) — ${durationMs}ms`,
       );
     }
   } finally {
