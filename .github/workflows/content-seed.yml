@@ -1,0 +1,67 @@
+name: Content seed (producción)
+
+# Disparo manual únicamente (nunca desde push/pull_request): este workflow
+# escribe contra la Neon de producción. Sin CMD del contenedor a propósito —
+# ver docs/adr/0007 — así que esta es la única vía para llevar content/de/a1
+# a producción.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Escribe "seed-production" para confirmar que quieres sembrar Neon (producción)'
+        required: true
+
+concurrency:
+  group: content-seed-production
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    # Salvaguarda además del gate de confirm: workflow_dispatch permite elegir
+    # cualquier rama desde la UI de GitHub, así que sin este `if` alguien
+    # podría lanzar el seed apuntando a una rama con contenido sin revisar.
+    if: github.ref == 'refs/heads/main'
+    # Entorno "production": permite añadir más adelante reviewers obligatorios
+    # u otras reglas de protección desde Settings > Environments sin tocar
+    # este fichero.
+    environment: production
+    steps:
+      - name: Comprobar confirmación
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "seed-production" ]; then
+            echo "Confirmación incorrecta: escribe exactamente 'seed-production'." >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # apps/api importa @sprachbaum/content-schema y @sprachbaum/shared como
+      # dependencias normales (main: dist/index.js), no por su código fuente,
+      # así que hace falta compilarlas antes de que content:seed las importe
+      # (mismo problema ya resuelto en el job e2e de ci.yml).
+      - name: Construir dependencias del workspace (content-schema, shared)
+        run: pnpm exec turbo run build --filter=api^...
+
+      # apps/api envuelve content:seed con `dotenv -e ../../.env --`, así que
+      # necesita este fichero. No se hace `cat`/echo del contenido en ningún
+      # paso: aunque GitHub enmascara el valor del secret en los logs, evitar
+      # imprimirlo es la defensa que no depende de esa máscara.
+      - name: Generar .env con la DATABASE_URL de producción
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        run: printf 'DATABASE_URL=%s\n' "$DATABASE_URL" > .env
+
+      - name: Seed de contenido contra Neon (producción)
+        run: pnpm content:seed

@@ -223,6 +223,7 @@ export class LessonsService {
             title: true,
             content: true,
             vocabItems: {
+              where: { archivedAt: null },
               orderBy: { order: 'asc' },
               select: {
                 slug: true,

@@ -11,7 +11,8 @@ function notInSafely(slugs: string[]): string[] {
 /**
  * Aplica una `LessonPlan` a Postgres de forma idempotente: upsert por slug de
  * cada entidad, y borrado de huérfanos (filas que existían para esta lección
- * y ya no aparecen en el YAML), todo dentro de una transacción.
+ * y ya no aparecen en el YAML), todo dentro de una transacción. Excepción:
+ * VocabItem no se borra, se archiva (ver docs/adr/0007).
  */
 export async function seedLesson(
   prisma: PrismaClient,
@@ -126,6 +127,9 @@ export async function seedLesson(
           gender: item.gender,
           plural: item.plural,
           order: item.order,
+          // Reaparece en el YAML: si estaba archivado (ver más abajo),
+          // desarchivar en vez de dejarlo huérfano de su propio contenido.
+          archivedAt: null,
         },
         create: {
           slug: item.slug,
@@ -176,12 +180,18 @@ export async function seedLesson(
       });
     }
 
-    // Borrado de huérfanos, todo scopeado a esta lección.
-    await tx.vocabItem.deleteMany({
+    // Borrado de huérfanos, todo scopeado a esta lección. VocabItem es la
+    // excepción: se archiva en vez de borrarse porque SrsCard depende de su
+    // id y borrar la fila destruiría el historial FSRS del usuario (ver
+    // docs/adr/0007). `update` en el upsert de arriba ya desarchiva los que
+    // reaparecen, así que este paso solo toca a los que de verdad se fueron.
+    await tx.vocabItem.updateMany({
       where: {
         sectionId: { in: existingSections.map((s) => s.id) },
         slug: { notIn: notInSafely(plan.vocabItems.map((v) => v.slug)) },
+        archivedAt: null,
       },
+      data: { archivedAt: new Date() },
     });
     await tx.exercise.deleteMany({
       where: {

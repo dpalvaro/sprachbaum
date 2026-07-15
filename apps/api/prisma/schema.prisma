@@ -136,6 +136,12 @@ model VocabItem {
   gender             VocabGender?
   plural             String?
   order              Int
+  /// Soft-delete: set cuando el item desaparece del YAML en un re-seed, en vez
+  /// de borrarlo, porque SrsCard.vocabItemId depende de este id (ver
+  /// docs/adr/0007) y borrar la fila destruiría el historial FSRS del
+  /// usuario. Filtrado al servir contenido (lessons/srs); un item que
+  /// reaparece en el YAML se desarchiva (vuelve a null) en vez de recrearse.
+  archivedAt         DateTime?
   srsCards           SrsCard[]
 }
 
