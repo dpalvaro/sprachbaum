@@ -142,7 +142,7 @@ export class SrsService {
     lessonId: string,
   ): Promise<number> {
     const vocabItems = await tx.vocabItem.findMany({
-      where: { section: { lessonId } },
+      where: { section: { lessonId }, archivedAt: null },
       select: { id: true },
     });
 
@@ -184,7 +184,14 @@ export class SrsService {
     startOfToday.setHours(0, 0, 0, 0);
 
     const dueCards = await this.prisma.srsCard.findMany({
-      where: { userId, state: { not: SrsCardState.New }, due: { lte: now } },
+      where: {
+        userId,
+        state: { not: SrsCardState.New },
+        due: { lte: now },
+        // Palabra retirada del currículo (ver docs/adr/0007): la tarjeta y su
+        // historial se conservan, pero deja de proponerse en la sesión diaria.
+        vocabItem: { archivedAt: null },
+      },
       orderBy: { due: 'asc' },
       select: {
         id: true,
@@ -205,7 +212,11 @@ export class SrsService {
     const newCards =
       remainingQuota > 0
         ? await this.prisma.srsCard.findMany({
-            where: { userId, state: SrsCardState.New },
+            where: {
+              userId,
+              state: SrsCardState.New,
+              vocabItem: { archivedAt: null },
+            },
             orderBy: { createdAt: 'asc' },
             take: remainingQuota,
             select: {

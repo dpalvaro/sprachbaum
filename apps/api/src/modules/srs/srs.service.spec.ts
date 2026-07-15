@@ -39,7 +39,7 @@ describe('SrsService', () => {
 
       expect(count).toBe(2);
       expect(vocabFindMany).toHaveBeenCalledWith({
-        where: { section: { lessonId: 'lesson-1' } },
+        where: { section: { lessonId: 'lesson-1' }, archivedAt: null },
         select: { id: true },
       });
       expect(upsert).toHaveBeenCalledTimes(2);
@@ -146,6 +146,7 @@ describe('SrsService', () => {
       expect(newCardsCall.where).toEqual({
         userId,
         state: SrsCardState.New,
+        vocabItem: { archivedAt: null },
       });
     });
 
