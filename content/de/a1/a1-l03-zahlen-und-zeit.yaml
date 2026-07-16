@@ -1,0 +1,832 @@
+# Lección 3 de A1 — "Zahlen und Zeit" (Números y tiempo)
+# Conforme a docs/content-schema-design.md, siguiendo el gold standard de a1-l01-hallo.yaml
+# y a1-l02-ich-und-du.yaml.
+# Nota: los audioUrl (listening y dictations) son placeholders; se generan vía TTS en la issue #28.
+# Pendiente de validación nativa (issue #30), como todo el contenido A1.
+#
+# Avisos abiertos para la revisión nativa:
+#   - Plurales de meses y partes del día (Januare, Mittage, Julis...): baja confianza, uso casi nulo.
+#     Se dejan a la espera de validación; ver discusión sobre permitir `plural` opcional en estos casos.
+#   - Variante suiza de la hora (viertel ab / drei viertel): omitida deliberadamente.
+#   - Prefijos telefónicos (044 Zürich, 089 München, 078 móvil CH): verificar.
+#   - `Ich habe frei`, `Ich habe Deutschkurs` (sin artículo): idiomáticos, confianza razonable no total.
+#   - Los ejercicios `dictation` (l03-listen-q07/q08) son los primeros del contenido: comprobar que el
+#     runner los soporta. El `expected` debe concordar cifra a cifra con lo que lea el TTS.
+#   - `haben` entra aquí como item de vocabulario, sin hito gramatical propio en el syllabus.
+
+slug: a1-l03-zahlen-und-zeit
+level: A1
+order: 3
+title:
+  es: "Números y tiempo"
+  de: "Zahlen und Zeit"
+objectives:
+  - es: "Contar y usar los números (edad, teléfono, precios)"
+  - es: "Decir y preguntar la hora, en formato coloquial y oficial"
+  - es: "Situar acciones en el tiempo (días de la semana, partes del día, horarios)"
+
+sections:
+  # ------------------------------------------------------------------
+  # SECCIÓN 1 — GRAMÁTICA: los números cardinales
+  # ------------------------------------------------------------------
+  - type: grammar
+    slug: l03-grammar-numbers
+    title:
+      es: "Los números y cómo se construyen"
+    explanation:
+      es: >
+        Los números del 0 al 12 hay que memorizarlos: null, eins, zwei, drei,
+        vier, fünf, sechs, sieben, acht, neun, zehn, elf, zwölf. Del 13 al 19 es
+        fácil: unidad + *zehn* (dreizehn, vierzehn, fünfzehn...). Las decenas
+        acaban en *-zig*: zwanzig, vierzig, fünfzig, sechzig, siebzig, achtzig,
+        neunzig. Tres irregulares que conviene fijar ya: *sechzehn* y *sechzig*
+        pierden la -s de sechs; *siebzehn* y *siebzig* pierden el -en de sieben;
+        y 30 es *dreißig*, con -ßig, no -zig. Lo más ajeno al español viene
+        ahora: a partir de 21 se dice primero la unidad y luego la decena, unidas
+        por *und*. Así, 21 = einundzwanzig ("uno-y-veinte"), 45 =
+        fünfundvierzig, 99 = neunundneunzig. Ojo: en esa construcción, eins
+        pierde la -s (einundzwanzig, no *einsundzwanzig*). Todo se escribe en una
+        sola palabra, por larga que sea. 100 es hundert (o einhundert), 1000 es
+        tausend. Dos usos inmediatos: la edad, con el verbo sein que ya conoces
+        (*Ich bin dreißig Jahre alt*), y el teléfono, que en alemán se dice
+        cifra a cifra, no en parejas como en español.
+    examples:
+      - de: "Ich bin fünfundzwanzig Jahre alt."
+        es: "Tengo veinticinco años."
+        note:
+          es: "En alemán la edad se dice con sein (ser), no con haber/tener: literalmente 'soy 25 años viejo'."
+      - de: "Wie alt bist du?"
+        es: "¿Cuántos años tienes?"
+      - de: "Meine Telefonnummer ist null vier vier, drei acht sieben."
+        es: "Mi número de teléfono es 044 387."
+        note:
+          es: "Cifra a cifra. En Suiza los prefijos empiezan por 0 (Zürich = 044)."
+      - de: "Die Wohnung kostet dreizehnhundert Franken."
+        es: "El piso cuesta 1300 francos."
+        note:
+          es: "Entre 1100 y 1999 es habitual contar en centenas: dreizehnhundert = 13 x 100. Se usa mucho con precios y años."
+      - de: "Ich wohne in der Bahnhofstraße einundzwanzig."
+        es: "Vivo en la Bahnhofstraße 21."
+    exercises:
+      - slug: l03-num-ex01
+        type: multiple_choice
+        prompt: { es: "¿Cómo se dice 13?" }
+        options: ["dreizig", "dreizehn", "dreiundzehn", "zehndrei"]
+        correctIndices: [1]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex02
+        type: multiple_choice
+        prompt: { es: "¿Cómo se escribe 30?" }
+        options: ["dreizig", "dreissigzehn", "dreißig", "dreizehnzig"]
+        correctIndices: [2]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex03
+        type: fill_blank
+        prompt: { es: "Escribe el número 16 en letra." }
+        text: "16 = ___"
+        blanks:
+          - id: b1
+            accept: ["sechzehn"]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex04
+        type: fill_blank
+        prompt: { es: "Escribe el número 21 en letra (una sola palabra)." }
+        text: "21 = ___"
+        blanks:
+          - id: b1
+            accept: ["einundzwanzig"]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex05
+        type: multiple_choice
+        prompt: { es: "¿Cómo se dice 45?" }
+        options: ["vierzigfünf", "fünfundvierzig", "vierundfünfzig", "fünfzigvier"]
+        correctIndices: [1]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex06
+        type: matching
+        prompt: { es: "Empareja cada número con su cifra." }
+        pairs:
+          - { left: "siebzehn", right: { es: "17" } }
+          - { left: "siebzig", right: { es: "70" } }
+          - { left: "sechzehn", right: { es: "16" } }
+          - { left: "sechzig", right: { es: "60" } }
+        skillTag: grammar:numbers
+      - slug: l03-num-ex07
+        type: fill_blank
+        prompt: { es: "Escribe el número 99 en letra." }
+        text: "99 = ___"
+        blanks:
+          - id: b1
+            accept: ["neunundneunzig"]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex08
+        type: sentence_order
+        prompt: { es: "Ordena la frase: 'Tengo 25 años.'" }
+        fragments: ["Jahre", "bin", "alt", "ich", "fünfundzwanzig"]
+        correctOrder: [3, 1, 4, 0, 2]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex09
+        type: fill_blank
+        prompt: { es: "¿Cuántos años tienes? (completa la pregunta informal)" }
+        text: "Wie ___ bist du?"
+        blanks:
+          - id: b1
+            accept: ["alt"]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex10
+        type: multiple_choice
+        prompt: { es: "En einundzwanzig, ¿qué se dice primero?" }
+        options: ["la decena", "la unidad", "da igual"]
+        correctIndices: [1]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex11
+        type: short_answer
+        prompt: { es: "¿Cómo se dice 100 en alemán? (una palabra)" }
+        accept: ["hundert", "einhundert"]
+        skillTag: grammar:numbers
+      - slug: l03-num-ex12
+        type: multiple_choice
+        prompt: { es: "Ich bin ___ Jahre alt. (32)" }
+        options: ["dreiundzwanzig", "zweiunddreißig", "dreißigzwei", "zweiunddreizig"]
+        correctIndices: [1]
+        skillTag: grammar:numbers
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 2 — GRAMÁTICA: la hora y las preguntas de tiempo
+  # ------------------------------------------------------------------
+  - type: grammar
+    slug: l03-grammar-time
+    title:
+      es: "¿Qué hora es? Decir la hora y preguntar por el tiempo"
+    explanation:
+      es: >
+        Para preguntar la hora tienes dos fórmulas equivalentes: *Wie spät ist
+        es?* y *Wie viel Uhr ist es?*. Se responde con *Es ist...*: Es ist drei
+        Uhr (son las tres). Fíjate en que *Uhr* no cambia nunca y que el alemán
+        usa el singular (*es ist*), no el plural del español ("son las"). El
+        alemán tiene dos maneras de decir la hora. La **oficial** (24 horas) se
+        usa en horarios de tren, aeropuertos, radio y citas formales: se dice la
+        hora, luego *Uhr*, luego los minutos — *Es ist vierzehn Uhr dreißig*
+        (14:30). Es la más fácil: solo necesitas los números de la sección
+        anterior. La **coloquial** (12 horas) es la de la calle y usa cuatro
+        piezas: *nach* (pasada la hora), *vor* (antes de la hora), *Viertel*
+        (cuarto) y *halb* (media). Es ist zehn nach drei (3:10), es ist Viertel
+        nach drei (3:15), es ist zehn vor vier (3:50), es ist Viertel vor vier
+        (3:45). Y ahora lo importante, porque aquí se equivoca todo
+        hispanohablante: **halb** no funciona como "y media". El alemán no mira
+        la hora que deja atrás, sino la que viene: *halb drei* significa **2:30**
+        ("media hora hacia las tres"), no las 3:30. Regla práctica: con *halb*,
+        resta una hora respecto al español. Para situar acciones en el tiempo
+        necesitas tres preposiciones: *um* + hora exacta (um acht Uhr, a las
+        ocho), *am* + día (am Montag, el lunes), y *von... bis...* para un
+        intervalo (von neun bis fünf, de nueve a cinco). Y dos W-Fragen nuevas
+        que se suman a las de la lección anterior: *Wann?* (¿cuándo?) y *Um wie
+        viel Uhr?* (¿a qué hora?), que siguen la estructura que ya conoces:
+        palabra interrogativa + verbo + sujeto.
+    examples:
+      - de: "Wie spät ist es? — Es ist zwölf Uhr."
+        es: "¿Qué hora es? — Son las doce."
+      - de: "Es ist halb drei."
+        es: "Son las dos y media."
+        note:
+          es: "¡Atención! halb drei = 2:30, NO 3:30. El alemán cuenta hacia la hora siguiente. Con halb, resta una hora respecto al español."
+      - de: "Es ist Viertel nach acht."
+        es: "Son las ocho y cuarto."
+      - de: "Es ist Viertel vor neun."
+        es: "Son las nueve menos cuarto."
+      - de: "Der Zug nach Zürich fährt um sechs Uhr zweiundvierzig."
+        es: "El tren a Zúrich sale a las 6:42."
+        note:
+          es: "Hora oficial: los horarios de tren en Suiza son famosos por su precisión al minuto. Aquí no se usa halb ni Viertel."
+      - de: "Ich arbeite von neun bis fünf."
+        es: "Trabajo de nueve a cinco."
+      - de: "Wann beginnt der Deutschkurs? — Am Montag um achtzehn Uhr."
+        es: "¿Cuándo empieza el curso de alemán? — El lunes a las 18:00."
+    exercises:
+      - slug: l03-time-ex01
+        type: multiple_choice
+        prompt: { es: "¿Qué hora es 'halb drei'?" }
+        options: ["2:30", "3:00", "3:30", "2:00"]
+        correctIndices: [0]
+        skillTag: grammar:time
+      - slug: l03-time-ex02
+        type: multiple_choice
+        prompt: { es: "Son las siete y media. ¿Cómo se dice en alemán?" }
+        options: ["halb sieben", "halb acht", "sieben halb", "Viertel nach sieben"]
+        correctIndices: [1]
+        skillTag: grammar:time
+      - slug: l03-time-ex03
+        type: fill_blank
+        prompt: { es: "Completa la pregunta: '¿Qué hora es?'" }
+        text: "Wie ___ ist es?"
+        blanks:
+          - id: b1
+            accept: ["spät", "spaet"]
+        skillTag: grammar:time
+      - slug: l03-time-ex04
+        type: multiple_choice
+        prompt: { es: "Es ist Viertel ___ neun. (8:45)" }
+        options: ["nach", "vor", "halb", "um"]
+        correctIndices: [1]
+        skillTag: grammar:time
+      - slug: l03-time-ex05
+        type: fill_blank
+        prompt: { es: "Completa: son las cinco y cuarto (5:15)." }
+        text: "Es ist Viertel ___ fünf."
+        blanks:
+          - id: b1
+            accept: ["nach"]
+        skillTag: grammar:time
+      - slug: l03-time-ex06
+        type: matching
+        prompt: { es: "Empareja cada expresión con su hora." }
+        pairs:
+          - { left: "halb zehn", right: { es: "9:30" } }
+          - { left: "Viertel nach zehn", right: { es: "10:15" } }
+          - { left: "Viertel vor zehn", right: { es: "9:45" } }
+          - { left: "zehn Uhr", right: { es: "10:00" } }
+        skillTag: grammar:time
+      - slug: l03-time-ex07
+        type: multiple_choice
+        prompt: { es: "¿Qué preposición va con una hora exacta?" }
+        options: ["am", "um", "von", "in"]
+        correctIndices: [1]
+        skillTag: grammar:time
+      - slug: l03-time-ex08
+        type: fill_blank
+        prompt: { es: "Completa: 'Trabajo el lunes.'" }
+        text: "Ich arbeite ___ Montag."
+        blanks:
+          - id: b1
+            accept: ["am"]
+        skillTag: grammar:time
+      - slug: l03-time-ex09
+        type: fill_blank
+        prompt: { es: "Completa: 'El tren sale a las ocho.'" }
+        text: "Der Zug fährt ___ acht Uhr."
+        blanks:
+          - id: b1
+            accept: ["um"]
+        skillTag: grammar:time
+      - slug: l03-time-ex10
+        type: sentence_order
+        prompt: { es: "Ordena la frase: 'Trabajo a las ocho.'" }
+        fragments: ["um", "Uhr", "ich", "acht", "arbeite"]
+        correctOrder: [2, 4, 0, 3, 1]
+        skillTag: grammar:time
+      - slug: l03-time-ex11
+        type: sentence_order
+        prompt: { es: "Ordena la pregunta: '¿Cuándo empieza el curso?'" }
+        fragments: ["der Kurs", "wann", "beginnt"]
+        correctOrder: [1, 2, 0]
+        skillTag: grammar:time
+      - slug: l03-time-ex12
+        type: multiple_choice
+        prompt: { es: "Hora oficial: ¿cómo se dice 14:30?" }
+        options: ["halb drei Uhr", "vierzehn Uhr dreißig", "zwei Uhr dreißig nach", "dreißig nach vierzehn"]
+        correctIndices: [1]
+        skillTag: grammar:time
+      - slug: l03-time-ex13
+        type: fill_blank
+        prompt: { es: "Completa: 'Trabajo de nueve a cinco.'" }
+        text: "Ich arbeite ___ neun ___ fünf."
+        blanks:
+          - id: b1
+            accept: ["von"]
+          - id: b2
+            accept: ["bis"]
+        skillTag: grammar:time
+      - slug: l03-time-ex14
+        type: short_answer
+        prompt: { es: "¿Qué palabra interrogativa significa '¿cuándo?'" }
+        accept: ["wann", "Wann"]
+        skillTag: grammar:time
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 3 — VOCABULARIO: números, días, meses y tiempo
+  # ------------------------------------------------------------------
+  - type: vocabulary
+    slug: l03-vocab-numbers-time
+    topic:
+      es: "Números, días de la semana, meses y expresiones de tiempo (todos los días y meses son masculinos: der)"
+    items:
+      # --- piezas de los números ---
+      - slug: voc-null
+        lemma: "null"
+        translation: { es: "cero" }
+        example: "Meine Nummer beginnt mit null vier vier."
+        partOfSpeech: other
+      - slug: voc-eins
+        lemma: "eins"
+        translation: { es: "uno (pierde la -s ante un sustantivo o en einundzwanzig)" }
+        example: "Eins, zwei, drei!"
+        partOfSpeech: other
+      - slug: voc-zehn
+        lemma: "zehn"
+        translation: { es: "diez" }
+        example: "Ich habe zehn Minuten."
+        partOfSpeech: other
+      - slug: voc-zwanzig
+        lemma: "zwanzig"
+        translation: { es: "veinte" }
+        example: "Ich bin zwanzig Jahre alt."
+        partOfSpeech: other
+      - slug: voc-dreissig
+        lemma: "dreißig"
+        translation: { es: "treinta (ojo: -ßig, no -zig)" }
+        example: "Es ist vierzehn Uhr dreißig."
+        partOfSpeech: other
+      - slug: voc-hundert
+        lemma: "hundert"
+        translation: { es: "cien" }
+        example: "Das kostet hundert Franken."
+        partOfSpeech: other
+      - slug: voc-tausend
+        lemma: "tausend"
+        translation: { es: "mil" }
+        example: "Zürich hat mehr als tausend Straßen."
+        partOfSpeech: other
+      # --- sustantivos de tiempo ---
+      - slug: voc-uhr
+        lemma: "die Uhr"
+        translation: { es: "el reloj / la hora (en 'drei Uhr')" }
+        example: "Es ist acht Uhr."
+        partOfSpeech: noun
+        gender: die
+        plural: "Uhren"
+      - slug: voc-zeit
+        lemma: "die Zeit"
+        translation: { es: "el tiempo (cronológico)" }
+        example: "Hast du Zeit?"
+        partOfSpeech: noun
+        gender: die
+        plural: "Zeiten"
+      - slug: voc-minute
+        lemma: "die Minute"
+        translation: { es: "el minuto" }
+        example: "Der Zug kommt in fünf Minuten."
+        partOfSpeech: noun
+        gender: die
+        plural: "Minuten"
+      - slug: voc-stunde
+        lemma: "die Stunde"
+        translation: { es: "la hora (duración de 60 minutos)" }
+        example: "Der Kurs dauert zwei Stunden."
+        partOfSpeech: noun
+        gender: die
+        plural: "Stunden"
+      - slug: voc-tag
+        lemma: "der Tag"
+        translation: { es: "el día" }
+        example: "Guten Tag!"
+        partOfSpeech: noun
+        gender: der
+        plural: "Tage"
+      - slug: voc-woche
+        lemma: "die Woche"
+        translation: { es: "la semana" }
+        example: "Ich arbeite fünf Tage pro Woche."
+        partOfSpeech: noun
+        gender: die
+        plural: "Wochen"
+      - slug: voc-jahr
+        lemma: "das Jahr"
+        translation: { es: "el año" }
+        example: "Ich bin dreißig Jahre alt."
+        partOfSpeech: noun
+        gender: das
+        plural: "Jahre"
+      - slug: voc-monat
+        lemma: "der Monat"
+        translation: { es: "el mes" }
+        example: "Januar ist ein kalter Monat."
+        partOfSpeech: noun
+        gender: der
+        plural: "Monate"
+      - slug: voc-telefonnummer
+        lemma: "die Telefonnummer"
+        translation: { es: "el número de teléfono" }
+        example: "Wie ist deine Telefonnummer?"
+        partOfSpeech: noun
+        gender: die
+        plural: "Telefonnummern"
+      # --- días de la semana ---
+      - slug: voc-montag
+        lemma: "der Montag"
+        translation: { es: "el lunes" }
+        example: "Am Montag arbeite ich."
+        partOfSpeech: noun
+        gender: der
+        plural: "Montage"
+      - slug: voc-dienstag
+        lemma: "der Dienstag"
+        translation: { es: "el martes" }
+        example: "Der Deutschkurs ist am Dienstag."
+        partOfSpeech: noun
+        gender: der
+        plural: "Dienstage"
+      - slug: voc-mittwoch
+        lemma: "der Mittwoch"
+        translation: { es: "el miércoles (literalmente: 'mitad de semana')" }
+        example: "Am Mittwoch habe ich Zeit."
+        partOfSpeech: noun
+        gender: der
+        plural: "Mittwoche"
+      - slug: voc-donnerstag
+        lemma: "der Donnerstag"
+        translation: { es: "el jueves" }
+        example: "Am Donnerstag lerne ich Deutsch."
+        partOfSpeech: noun
+        gender: der
+        plural: "Donnerstage"
+      - slug: voc-freitag
+        lemma: "der Freitag"
+        translation: { es: "el viernes" }
+        example: "Am Freitag arbeite ich bis drei Uhr."
+        partOfSpeech: noun
+        gender: der
+        plural: "Freitage"
+      - slug: voc-samstag
+        lemma: "der Samstag"
+        translation: { es: "el sábado" }
+        example: "Am Samstag bin ich in Zürich."
+        partOfSpeech: noun
+        gender: der
+        plural: "Samstage"
+      - slug: voc-sonntag
+        lemma: "der Sonntag"
+        translation: { es: "el domingo" }
+        example: "Am Sonntag arbeite ich nicht."
+        partOfSpeech: noun
+        gender: der
+        plural: "Sonntage"
+      - slug: voc-wochenende
+        lemma: "das Wochenende"
+        translation: { es: "el fin de semana (con 'am': am Wochenende)" }
+        example: "Am Wochenende bin ich in Bern."
+        partOfSpeech: noun
+        gender: das
+        plural: "Wochenenden"
+      # --- partes del día ---
+      - slug: voc-morgen-n
+        lemma: "der Morgen"
+        translation: { es: "la mañana (ojo: 'morgen' en minúscula significa 'mañana, el día siguiente')" }
+        example: "Am Morgen trinke ich Kaffee."
+        partOfSpeech: noun
+        gender: der
+        plural: "Morgen"
+      - slug: voc-vormittag
+        lemma: "der Vormittag"
+        translation: { es: "la mañana (antes del mediodía)" }
+        example: "Am Vormittag arbeite ich."
+        partOfSpeech: noun
+        gender: der
+        plural: "Vormittage"
+      - slug: voc-mittag
+        lemma: "der Mittag"
+        translation: { es: "el mediodía" }
+        example: "Am Mittag esse ich um zwölf."
+        partOfSpeech: noun
+        gender: der
+        plural: "Mittage"
+      - slug: voc-nachmittag
+        lemma: "der Nachmittag"
+        translation: { es: "la tarde (hasta ~18h)" }
+        example: "Am Nachmittag lerne ich Deutsch."
+        partOfSpeech: noun
+        gender: der
+        plural: "Nachmittage"
+      - slug: voc-abend
+        lemma: "der Abend"
+        translation: { es: "la tarde-noche (desde ~18h)" }
+        example: "Am Abend bin ich zu Hause."
+        partOfSpeech: noun
+        gender: der
+        plural: "Abende"
+      - slug: voc-nacht
+        lemma: "die Nacht"
+        translation: { es: "la noche (ojo: con 'in': in der Nacht)" }
+        example: "In der Nacht schlafe ich."
+        partOfSpeech: noun
+        gender: die
+        plural: "Nächte"
+      # --- meses (selección) ---
+      - slug: voc-januar
+        lemma: "der Januar"
+        translation: { es: "enero" }
+        example: "Im Januar ist es kalt."
+        partOfSpeech: noun
+        gender: der
+        plural: "Januare"
+      - slug: voc-juli
+        lemma: "der Juli"
+        translation: { es: "julio" }
+        example: "Im Juli bin ich in Spanien."
+        partOfSpeech: noun
+        gender: der
+        plural: "Julis"
+      - slug: voc-dezember
+        lemma: "der Dezember"
+        translation: { es: "diciembre" }
+        example: "Im Dezember habe ich Ferien."
+        partOfSpeech: noun
+        gender: der
+        plural: "Dezember"
+      # --- otras expresiones de tiempo ---
+      - slug: voc-heute
+        lemma: "heute"
+        translation: { es: "hoy" }
+        example: "Heute ist Montag."
+        partOfSpeech: adverb
+      - slug: voc-morgen-adv
+        lemma: "morgen"
+        translation: { es: "mañana (el día siguiente)" }
+        example: "Morgen arbeite ich nicht."
+        partOfSpeech: adverb
+      - slug: voc-immer
+        lemma: "immer"
+        translation: { es: "siempre" }
+        example: "Der Zug kommt immer pünktlich."
+        partOfSpeech: adverb
+      - slug: voc-puenktlich
+        lemma: "pünktlich"
+        translation: { es: "puntual / a la hora" }
+        example: "In der Schweiz ist der Zug pünktlich."
+        partOfSpeech: adjective
+      - slug: voc-frueh
+        lemma: "früh"
+        translation: { es: "temprano" }
+        example: "Ich stehe früh auf."
+        partOfSpeech: adjective
+      - slug: voc-spaet
+        lemma: "spät"
+        translation: { es: "tarde" }
+        example: "Wie spät ist es?"
+        partOfSpeech: adjective
+      - slug: voc-wann
+        lemma: "wann"
+        translation: { es: "cuándo" }
+        example: "Wann beginnt der Kurs?"
+        partOfSpeech: other
+      - slug: voc-haben
+        lemma: "haben"
+        translation: { es: "tener (irregular: ich habe, du hast, er hat)" }
+        example: "Hast du Zeit?"
+        partOfSpeech: verb
+      - slug: voc-beginnen
+        lemma: "beginnen"
+        translation: { es: "empezar" }
+        example: "Der Kurs beginnt um acht."
+        partOfSpeech: verb
+      - slug: voc-dauern
+        lemma: "dauern"
+        translation: { es: "durar" }
+        example: "Der Film dauert zwei Stunden."
+        partOfSpeech: verb
+    exercises:
+      - slug: l03-voc-ex01
+        type: matching
+        prompt: { es: "Empareja cada día con su traducción." }
+        pairs:
+          - { left: "der Montag", right: { es: "el lunes" } }
+          - { left: "der Mittwoch", right: { es: "el miércoles" } }
+          - { left: "der Freitag", right: { es: "el viernes" } }
+          - { left: "der Sonntag", right: { es: "el domingo" } }
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex02
+        type: matching
+        prompt: { es: "Empareja cada palabra con su traducción." }
+        pairs:
+          - { left: "die Woche", right: { es: "la semana" } }
+          - { left: "der Monat", right: { es: "el mes" } }
+          - { left: "das Jahr", right: { es: "el año" } }
+          - { left: "die Stunde", right: { es: "la hora (60 min)" } }
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex03
+        type: multiple_choice
+        prompt: { es: "¿Qué día viene después del Dienstag?" }
+        options: ["Montag", "Mittwoch", "Donnerstag", "Freitag"]
+        correctIndices: [1]
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex04
+        type: multiple_choice
+        prompt: { es: "¿Qué género tienen los días de la semana?" }
+        options: ["der", "die", "das"]
+        correctIndices: [0]
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex05
+        type: fill_blank
+        prompt: { es: "Completa: 'El fin de semana estoy en Zúrich.'" }
+        text: "Am ___ bin ich in Zürich."
+        blanks:
+          - id: b1
+            accept: ["Wochenende"]
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex06
+        type: multiple_choice
+        prompt: { es: "Son las 20:00. ¿Qué parte del día es?" }
+        options: ["der Morgen", "der Mittag", "der Nachmittag", "der Abend"]
+        correctIndices: [3]
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex07
+        type: multiple_choice
+        prompt: { es: "'Morgen arbeite ich nicht.' ¿Qué significa aquí morgen?" }
+        options: ["por la mañana", "mañana (el día siguiente)", "temprano"]
+        correctIndices: [1]
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex08
+        type: fill_blank
+        prompt: { es: "Completa: '¿Tienes tiempo?' (informal)" }
+        text: "___ du Zeit?"
+        blanks:
+          - id: b1
+            accept: ["Hast"]
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex09
+        type: fill_blank
+        prompt: { es: "Completa: 'El curso empieza a las ocho.'" }
+        text: "Der Kurs ___ um acht Uhr."
+        blanks:
+          - id: b1
+            accept: ["beginnt"]
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex10
+        type: multiple_choice
+        prompt: { es: "In der Schweiz ist der Zug immer ___." }
+        options: ["spät", "pünktlich", "früh", "kalt"]
+        correctIndices: [1]
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex11
+        type: matching
+        prompt: { es: "Empareja cada mes con su traducción." }
+        pairs:
+          - { left: "der Januar", right: { es: "enero" } }
+          - { left: "der Juli", right: { es: "julio" } }
+          - { left: "der Dezember", right: { es: "diciembre" } }
+        skillTag: vocab:numbers-time
+      - slug: l03-voc-ex12
+        type: short_answer
+        prompt: { es: "¿Cómo se dice 'la semana' en alemán? (con artículo)" }
+        accept: ["die Woche", "Woche"]
+        skillTag: vocab:numbers-time
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 4 — READING: el horario de Laura
+  # ------------------------------------------------------------------
+  - type: reading
+    slug: l03-reading-stundenplan
+    title:
+      es: "La semana de Laura"
+    text: |
+      Hallo! Ich bin Laura. Ich komme aus Spanien, aber ich wohne jetzt in Zürich. Ich arbeite als Ingenieurin und ich lerne Deutsch. Meine Woche ist sehr voll!
+
+      Von Montag bis Freitag arbeite ich von acht Uhr bis halb sechs. Das Büro ist in Zürich. Am Morgen bin ich immer pünktlich: der Zug kommt um sieben Uhr zweiundvierzig.
+
+      Am Montag und am Mittwoch habe ich Deutschkurs. Der Kurs beginnt um achtzehn Uhr dreißig und dauert zwei Stunden. Er ist nicht einfach, aber sehr interessant.
+
+      Am Freitag arbeite ich nur bis drei Uhr. Dann habe ich frei!
+
+      Am Wochenende bin ich oft nicht in Zürich. Am Samstag bin ich in Luzern oder in Bern — der Zug nach Luzern dauert fünfzig Minuten. Am Sonntag arbeite ich nicht und ich lerne auch nicht. Ich habe Zeit für Kaffee.
+
+      MEIN STUNDENPLAN
+      Montag:     08:00–17:30 Büro / 18:30–20:30 Deutschkurs
+      Dienstag:   08:00–17:30 Büro
+      Mittwoch:   08:00–17:30 Büro / 18:30–20:30 Deutschkurs
+      Donnerstag: 08:00–17:30 Büro
+      Freitag:    08:00–15:00 Büro
+      Samstag:    Luzern oder Bern
+      Sonntag:    frei
+    glossary:
+      - { term: "der Stundenplan", translation: { es: "el horario (plan de horas)" } }
+      - { term: "voll", translation: { es: "lleno/a" } }
+      - { term: "das Büro", translation: { es: "la oficina" } }
+      - { term: "der Deutschkurs", translation: { es: "el curso de alemán" } }
+      - { term: "nur", translation: { es: "solo / solamente" } }
+      - { term: "dann", translation: { es: "entonces / luego" } }
+      - { term: "frei haben", translation: { es: "tener el día libre (ich habe frei = estoy libre)" } }
+      - { term: "oft", translation: { es: "a menudo" } }
+      - { term: "der Zug", translation: { es: "el tren" } }
+      - { term: "für", translation: { es: "para" } }
+      - { term: "er (= der Kurs)", translation: { es: "él / ello — en alemán se usa 'er' también para cosas de género masculino, como der Kurs" } }
+      - { term: "Luzern", translation: { es: "Lucerna (ciudad suiza)" } }
+    questions:
+      - slug: l03-read-q01
+        type: multiple_choice
+        prompt: { es: "'Ich arbeite bis halb sechs.' ¿Qué hora es 'halb sechs' aquí?" }
+        options: ["16:30", "17:30", "18:00", "18:30"]
+        correctIndices: [1]
+        skillTag: reading:l03
+      - slug: l03-read-q02
+        type: multiple_choice
+        prompt: { es: "¿Qué días tiene curso de alemán?" }
+        options: ["Montag und Dienstag", "Montag und Mittwoch", "Mittwoch und Freitag", "Samstag und Sonntag"]
+        correctIndices: [1]
+        skillTag: reading:l03
+      - slug: l03-read-q03
+        type: multiple_choice
+        prompt: { es: "¿Cuánto dura el curso de alemán?" }
+        options: ["eine Stunde", "zwei Stunden", "drei Stunden"]
+        correctIndices: [1]
+        skillTag: reading:l03
+      - slug: l03-read-q04
+        type: multiple_choice
+        prompt: { es: "¿Qué día trabaja Laura menos horas?" }
+        options: ["Montag", "Mittwoch", "Freitag", "Sonntag"]
+        correctIndices: [2]
+        skillTag: reading:l03
+      - slug: l03-read-q05
+        type: short_answer
+        prompt: { es: "¿A qué hora llega su tren por la mañana? (escribe la hora en cifras, p. ej. 08:15)" }
+        accept: ["7:42", "07:42"]
+        skillTag: reading:l03
+      - slug: l03-read-q06
+        type: multiple_choice
+        prompt: { es: "¿Dónde está Laura los sábados?" }
+        options: ["im Büro", "in Zürich", "in Luzern oder in Bern", "in Spanien"]
+        correctIndices: [2]
+        skillTag: reading:l03
+
+  # ------------------------------------------------------------------
+  # SECCIÓN 5 — LISTENING: números y horas
+  # ------------------------------------------------------------------
+  - type: listening
+    slug: l03-listening-zahlen-uhrzeiten
+    title:
+      es: "Mensajes, anuncios y horas"
+    audio:
+      url: "PLACEHOLDER_a1-l03-listening.mp3"   # generar vía TTS (issue #28)
+      transcriptSlug: l03-listening-transcript
+    transcript: |
+      (Ansage 1 — Bahnhof Zürich) Achtung! Der Zug nach Luzern fährt um vierzehn Uhr zweiundzwanzig, Gleis sieben. Der Zug nach Bern fährt um vierzehn Uhr fünfunddreißig, Gleis drei.
+
+      (Nachricht 2 — Anrufbeantworter) Guten Tag, hier ist Sabine Meyer. Ich bin die Lehrerin. Der Deutschkurs beginnt am Dienstag, nicht am Montag! Er beginnt um achtzehn Uhr und dauert zwei Stunden. Meine Telefonnummer ist null acht neun, vier vier drei, zwei eins. Auf Wiederhören!
+
+      (Dialog 3 — im Büro) — Entschuldigung, wie spät ist es?
+      — Es ist halb zwölf.
+      — Danke! Mein Termin ist um zwölf Uhr.
+
+      (Nachricht 4 — Anrufbeantworter) Hallo Laura, hier ist Tom. Am Samstag bin ich in Zürich! Ich komme um elf Uhr. Hast du Zeit? Meine Nummer ist null sieben acht, sechs neun zwei. Bis Samstag!
+    questions:
+      - slug: l03-listen-q01
+        type: multiple_choice
+        prompt: { es: "¿A qué hora sale el tren a Lucerna?" }
+        options: ["14:02", "14:12", "14:22", "14:32"]
+        correctIndices: [2]
+        skillTag: listening:l03
+      - slug: l03-listen-q02
+        type: short_answer
+        prompt: { es: "¿De qué andén (Gleis) sale el tren a Berna? (una cifra)" }
+        accept: ["3", "drei"]
+        skillTag: listening:l03
+      - slug: l03-listen-q03
+        type: multiple_choice
+        prompt: { es: "¿Qué día empieza el curso de alemán?" }
+        options: ["am Montag", "am Dienstag", "am Mittwoch", "am Samstag"]
+        correctIndices: [1]
+        skillTag: listening:l03
+      - slug: l03-listen-q04
+        type: multiple_choice
+        prompt: { es: "¿A qué hora empieza el curso?" }
+        options: ["16:00", "18:00", "20:00"]
+        correctIndices: [1]
+        skillTag: listening:l03
+      - slug: l03-listen-q05
+        type: multiple_choice
+        prompt: { es: "'Es ist halb zwölf.' ¿Qué hora es?" }
+        options: ["11:30", "12:00", "12:30", "11:00"]
+        correctIndices: [0]
+        skillTag: listening:l03
+      - slug: l03-listen-q06
+        type: multiple_choice
+        prompt: { es: "¿A qué hora llega Tom el sábado?" }
+        options: ["um zehn Uhr", "um elf Uhr", "um zwölf Uhr"]
+        correctIndices: [1]
+        skillTag: listening:l03
+      - slug: l03-listen-q07
+        type: dictation
+        prompt: { es: "Escucha y escribe el número de teléfono de Frau Meyer (solo cifras, sin espacios)." }
+        audio:
+          url: "PLACEHOLDER_a1-l03-dictation-01.mp3"   # generar vía TTS (issue #28)
+        expected: "089443221"
+        skillTag: listening:l03
+      - slug: l03-listen-q08
+        type: dictation
+        prompt: { es: "Escucha y escribe la hora en cifras (formato 24h, p. ej. 14:22)." }
+        audio:
+          url: "PLACEHOLDER_a1-l03-dictation-02.mp3"   # generar vía TTS (issue #28)
+        expected: "14:35"
+        skillTag: listening:l03
+      - slug: l03-listen-q09
+        type: short_answer
+        prompt: { es: "¿Qué profesión tiene Sabine Meyer?" }
+        accept: ["Lehrerin", "lehrerin", "die Lehrerin"]
+        skillTag: listening:l03
+      - slug: l03-listen-q10
+        type: multiple_choice
+        prompt: { es: "¿Por qué llama Sabine Meyer?" }
+        options:
+          - { es: "Para cancelar el curso" }
+          - { es: "Para cambiar el día del curso" }
+          - { es: "Para preguntar la hora" }
+        correctIndices: [1]
+        skillTag: listening:l03
